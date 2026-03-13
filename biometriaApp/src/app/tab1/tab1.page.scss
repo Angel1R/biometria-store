@@ -1,0 +1,301 @@
+/* --- VARIABLES LOCALES --- */
+:host {
+  --app-bg: #f8f9fc;
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --card-bg: rgba(255, 255, 255, 0.9);  }
+
+/* --- FONDOS Y TEXTOS --- */
+.custom-bg {
+  --background: var(--app-bg);  }
+
+.custom-toolbar {
+  --background: var(--app-bg);
+  padding-top: 10px;    }
+
+.gradient-text {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.5px;   }
+
+.search-container {
+  margin-bottom: 24px;
+  padding: 0 10px;
+  
+  .welcome-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 5px 0;  }
+  
+  .sub-text {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin: 0 0 20px 0; }}
+
+/* --- BUSCADOR PREMIUM --- */
+.premium-search {
+  --background: #ffffff;
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --border-radius: 20px;
+  --icon-color: #6366f1;
+
+  --color: #1f2937;          /* color del texto */
+  --placeholder-color: #9ca3af;
+  
+  padding: 0;   }
+
+/* --- TARJETAS DE PRODUCTOS (Premium Card) --- */
+.premium-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    cursor: pointer;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.25s ease;
+    &:active {
+        transform: scale(0.96); }
+    background: var(--card-bg);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(10px);
+    margin: 10px 0;
+    border: 1px solid rgba(255,255,255, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+
+  /* Efecto Hover al pasar el mouse (para web) */
+    &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+
+    .image-wrapper img {
+        transform: scale(1.08);
+        width: 100%;
+        height: 100%;
+        object-fit: contain;    }}}
+
+.image-wrapper {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+  background-color: #ffffff;
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+
+  img {
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.5s ease;    }
+
+  .category-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--primary-gradient);
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }}
+
+.custom-header {
+  padding: 16px 16px 8px 16px;
+
+  .product-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #374151;
+    /* Truncar texto a 2 líneas */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;   }
+
+  .product-price {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #6366f1;
+    margin-top: 8px;    }}
+
+/* --- BOTÓN ME GUSTA INTERACTIVO --- */
+.card-action {
+  padding: 0 16px 16px 16px;
+
+  .like-button {
+    --background: rgba(99, 102, 241, 0.1); /* Fondo base suave */
+    --color: #6366f1; /* Letra azul/morada */
+    --box-shadow: none;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Transición de rebote */
+
+    .heart-icon {
+      color: #9ca3af; /* Gris por defecto (outline) */
+      transition: color 0.3s ease, transform 0.3s ease; }
+
+    &:active {
+      transform: scale(0.92); /* Se hunde un poquito al hacer clic */   }
+
+    /* ESTADO ACTIVO: Cuando el usuario ya le dio like */
+    &.active-like {
+      --background: rgba(236, 72, 153, 0.15); /* Fondo rosado suave */
+      --color: #be185d; /* Letra rosada oscura */
+
+      .heart-icon {
+        color: #ec4899; /* Corazón relleno rosado brillante */
+        animation: heartPop 0.4s ease forwards; }}}}
+
+/* Animación del latido del corazón */
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); } }
+
+/* --- ESTADOS VACÍOS --- */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+
+  .empty-icon {
+    font-size: 80px;
+    color: #a855f7;
+    margin-bottom: 20px;
+    opacity: 0.8;   }
+  
+  h3 {
+    color: #374151;
+    font-weight: 700;   }}
+
+/* --- ANIMACIONES GLOBALES --- */
+.animate-fade-up {
+  opacity: 0;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;    }
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(25px);    }
+  100% {
+    opacity: 1;
+    transform: translateY(0);   }}
+
+/* --- ESTILOS DEL MODAL BOTTOM SHEET --- */
+ion-modal.custom-bottom-sheet {
+  --border-radius: 28px 28px 0 0;
+  --box-shadow: 0 -20px 60px rgba(0,0,0,0.25);  }
+
+ion-modal.custom-bottom-sheet::part(backdrop) {
+  backdrop-filter: blur(14px);
+  background: rgba(0,0,0,0.50); }
+
+.modal-content {
+  --background: #ffffff;    }
+
+.modal-img-wrapper {
+    
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: #f8f9fc;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+  img {
+    max-height: 90%;
+    object-fit: contain;
+    transform: scale(0.9);
+    opacity: 0;
+    animation: imageReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;    }
+
+  .ai-match-badge {
+    position: absolute;
+    top: -10px;
+    right: 15px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }}
+
+@keyframes imageReveal {
+  0% {
+    transform: scale(0.85);
+    opacity: 0; }
+  100% {
+    transform: scale(1);
+    opacity: 1; }}
+
+.modal-info {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: modalContent 0.5s ease forwards;
+    animation-delay: 0.1s;
+    padding: 0 5px;
+
+  .modal-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin: 0 0 10px 0;
+    line-height: 1.2;   }
+
+  .modal-price {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #6366f1;
+    margin: 0;  }
+
+  .divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 20px 0; }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #4b5563;
+    margin-bottom: 10px;    }
+
+  .modal-description {
+    color: #6b7280;
+    line-height: 1.6;
+    font-size: 1rem;    }}
+
+@keyframes modalContent {
+  to {
+    opacity: 1;
+    transform: translateY(0);   }}
+
+.modal-footer {
+  margin-top: 30px;
+  margin-bottom: 20px;
+
+  .buy-button {
+    --background: var(--primary-gradient);
+    font-weight: 700;
+    font-size: 1.1rem;
+    --box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);  }}
+
+ion-col {
+  display: flex;    }
+
+ion-col ion-card {
+  width: 100%;  }

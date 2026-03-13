@@ -1,0 +1,128 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
+    <ion-title class="gradient-text font-bold">
+      BiometriaStore
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding custom-bg">
+  
+  <div class="search-container">
+    <h2 class="welcome-text">¿Qué estás buscando hoy?</h2>
+    <p class="sub-text">Nuestra IA te recomendará lo mejor.</p>
+    <ion-searchbar 
+      class="premium-search" 
+      animated="true" 
+      mode="ios"
+      placeholder="Ej. Tecnología, Ropa, Laptops..." 
+        debounce="250"
+      (ionInput)="cargarProductos($any($event.target).value)">
+    </ion-searchbar>
+  </div>
+
+  <ion-grid>
+    <ion-row>
+      
+      @for (prod of productos; track prod.product_id; let i = $index) {
+        <ion-col size="6" size-md="4" size-xl="3">
+
+          <ion-card 
+            class="premium-card animate-fade-up"
+            [style.animation-delay]="(i * 0.1) + 's'"
+            (click)="!modalTransition && abrirDetalle(prod)"          >
+
+            <div class="image-wrapper">
+              <img [src]="prod.thumbnail" [alt]="prod.title" loading="lazy" />
+              <ion-badge color="primary" class="category-badge">
+                {{ prod.category }}
+              </ion-badge>
+            </div>
+
+            <ion-card-header class="custom-header">
+              <ion-card-title class="product-title">
+                {{ prod.title }}
+              </ion-card-title>
+
+              <ion-card-subtitle class="product-price">
+                {{ prod.price | currency:'USD' }}
+              </ion-card-subtitle>
+            </ion-card-header>
+
+            <div class="card-action">
+              <ion-button
+                class="like-button"
+                [class.active-like]="likedProducts.has(prod.product_id)"
+                expand="block"
+                shape="round"
+                (click)="toggleLike(prod.product_id, $event)"
+              >
+
+                <ion-icon
+                  [name]="likedProducts.has(prod.product_id) ? 'heart' : 'heart-outline'"
+                  slot="start"
+                  class="heart-icon">
+                </ion-icon>
+
+                {{ likedProducts.has(prod.product_id) ? '¡Me encanta!' : 'Me Gusta' }}
+
+              </ion-button>
+            </div>
+
+          </ion-card>
+
+        </ion-col>
+      } @empty {
+        <ion-col size="12" class="empty-state animate-fade-up">
+          <ion-icon name="cube-outline" class="empty-icon"></ion-icon>
+          <h3>Sin resultados</h3>
+          <p>La inteligencia artificial está pensando... intenta con otra palabra.</p>
+        </ion-col>
+      }
+
+    </ion-row>
+  </ion-grid>
+
+  <ion-modal 
+    [isOpen]="modalAbierto" 
+    (didDismiss)="cerrarDetalle()"
+    [initialBreakpoint]="0.65" 
+    [breakpoints]="[0, 0.65, 0.95]"
+    [handle]="true"
+    [backdropDismiss]="true"
+    class="custom-bottom-sheet">
+    
+    <ng-template>
+      <ion-content class="modal-content ion-padding">
+        
+          @if (productoSeleccionado && modalAbierto) {
+            <div class="modal-img-wrapper">
+            <img [src]="productoSeleccionado.thumbnail" [alt]="productoSeleccionado.title" />
+            <div class="ai-match-badge">
+              <ion-icon name="sparkles"></ion-icon>
+              {{ obtenerPorcentajeMatch(productoSeleccionado.score) }}% Afinidad IA
+            </div>
+          </div>
+
+          <div class="modal-info">
+            <h2 class="modal-title">{{ productoSeleccionado.title }}</h2>
+            <p class="modal-price">{{ productoSeleccionado.price | currency:'USD' }}</p>
+            
+            <div class="divider"></div>
+            
+            <h3 class="section-title">Descripción</h3>
+            <p class="modal-description">{{ productoSeleccionado.description }}</p>
+          </div>
+
+          <div class="modal-footer">
+            <ion-button expand="block" shape="round" class="buy-button" size="large">
+              <ion-icon name="cart-outline" slot="start"></ion-icon>
+              Añadir al carrito
+            </ion-button>
+          </div>
+        }
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
