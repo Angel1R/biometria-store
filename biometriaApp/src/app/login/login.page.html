@@ -1,13 +1,119 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>login</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="login-page">
+  <div class="login-shell">
+    <section class="brand-panel">
+      <ion-chip class="brand-chip" color="light">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        <ion-label>BiometriaStore</ion-label>
+      </ion-chip>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">login</ion-title>
-    </ion-toolbar>
-  </ion-header>
+      <h1>Inicia sesion y personaliza tu vitrina</h1>
+      <p class="intro-copy">
+        Guarda tus gustos, recupera tu sesion y mejora las recomendaciones de la tienda.
+      </p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <ion-icon name="finger-print-outline"></ion-icon>
+          <span>Tu sesion se guarda en este dispositivo para el demo.</span>
+        </div>
+        <div class="feature-item">
+          <ion-icon name="sparkles-outline"></ion-icon>
+          <span>El catalogo se adapta a tus interacciones.</span>
+        </div>
+      </div>
+    </section>
+
+    <ion-card class="login-card">
+      <ion-card-content>
+        <div class="card-copy">
+          <p class="eyebrow">Acceso</p>
+          <h2>Entrar a la app</h2>
+          <p>Usa tus datos para abrir la experiencia personalizada.</p>
+        </div>
+
+        <form #loginForm="ngForm" (ngSubmit)="submit(loginForm)" novalidate>
+          <div class="field-group">
+            <ion-item class="input-item" lines="none">
+              <ion-label position="stacked">Nombre</ion-label>
+              <ion-input
+                name="name"
+                [(ngModel)]="credentials.name"
+                autocomplete="name"
+                placeholder="Ej. Sergio"
+                required>
+              </ion-input>
+            </ion-item>
+            @if (submitted && !credentials.name.trim()) {
+              <ion-note color="danger">Ingresa tu nombre.</ion-note>
+            }
+          </div>
+
+          <div class="field-group">
+            <ion-item class="input-item" lines="none">
+              <ion-label position="stacked">Correo</ion-label>
+              <ion-input
+                name="email"
+                [(ngModel)]="credentials.email"
+                type="email"
+                inputmode="email"
+                autocomplete="email"
+                placeholder="correo@ejemplo.com"
+                required
+                email>
+              </ion-input>
+            </ion-item>
+            @if (submitted && !loginForm.controls['email']?.valid) {
+              <ion-note color="danger">Ingresa un correo valido.</ion-note>
+            }
+          </div>
+
+          <div class="field-group">
+            <ion-item class="input-item" lines="none">
+              <ion-label position="stacked">Contrasena</ion-label>
+              <ion-input
+                name="password"
+                [(ngModel)]="credentials.password"
+                [type]="showPassword ? 'text' : 'password'"
+                autocomplete="current-password"
+                placeholder="Minimo 6 caracteres"
+                minlength="6"
+                required>
+              </ion-input>
+
+              <ion-button
+                type="button"
+                fill="clear"
+                color="medium"
+                slot="end"
+                aria-label="Mostrar u ocultar contrasena"
+                (click)="togglePasswordVisibility()">
+                <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+              </ion-button>
+            </ion-item>
+            @if (submitted && !loginForm.controls['password']?.valid) {
+              <ion-note color="danger">La contrasena debe tener al menos 6 caracteres.</ion-note>
+            }
+          </div>
+
+          @if (errorMessage) {
+            <div class="error-banner">{{ errorMessage }}</div>
+          }
+
+          <ion-button
+            type="submit"
+            expand="block"
+            shape="round"
+            class="submit-button"
+            [disabled]="isSubmitting">
+            @if (isSubmitting) {
+              <ion-spinner slot="start" name="crescent"></ion-spinner>
+            } @else {
+              <ion-icon slot="start" name="log-in-outline"></ion-icon>
+            }
+            {{ isSubmitting ? 'Entrando...' : 'Iniciar sesion' }}
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
