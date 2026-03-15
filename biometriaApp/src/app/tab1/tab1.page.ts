@@ -45,10 +45,8 @@ export class Tab1Page implements OnInit {
     if (idGuardado) {
       this.userId = idGuardado; // Ya lo conocemos
     } else {
-      // Como aún no hacemos la pantalla de Login, le generamos un ID único temporal
-      // Ejemplo: "user_a7b9c2"
+      // Como respaldo, pero ahora con el login real no debería pasar por aquí.
       this.userId = 'user_' + Math.random().toString(36).substring(2, 10);
-      localStorage.setItem('biometria_user_id', this.userId); // Lo guardamos en su celular
     }
     console.log('👤 Sesión activa para el usuario:', this.userId);
   }

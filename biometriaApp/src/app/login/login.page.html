@@ -27,11 +27,14 @@
       <ion-card-content>
         <div class="card-copy">
           <p class="eyebrow">Acceso</p>
-          <h2>Entrar a la app</h2>
-          <p>Usa tus datos para abrir la experiencia personalizada.</p>
+          <h2>{{ isLoginMode ? 'Entrar a la app' : 'Crear nueva cuenta' }}</h2>
+          <p>{{ isLoginMode ? 'Usa tus datos para abrir la experiencia personalizada.' : 'Regístrate para guardar tus gustos y opciones.' }}</p>
         </div>
 
         <form #loginForm="ngForm" (ngSubmit)="submit(loginForm)" novalidate>
+          
+          <!-- Mostrar "Nombre" solo si es Registro -->
+          @if (!isLoginMode) {
           <div class="field-group">
             <ion-item class="input-item" lines="none">
               <ion-label position="stacked">Nombre</ion-label>
@@ -47,6 +50,7 @@
               <ion-note color="danger">Ingresa tu nombre.</ion-note>
             }
           </div>
+          }
 
           <div class="field-group">
             <ion-item class="input-item" lines="none">
@@ -110,8 +114,14 @@
             } @else {
               <ion-icon slot="start" name="log-in-outline"></ion-icon>
             }
-            {{ isSubmitting ? 'Entrando...' : 'Iniciar sesion' }}
+            {{ isSubmitting ? 'Procesando...' : (isLoginMode ? 'Iniciar sesion' : 'Registrarse') }}
           </ion-button>
+
+          <div class="toggle-mode" style="margin-top: 1rem; text-align: center;">
+            <ion-button fill="clear" color="medium" (click)="toggleMode()" type="button" [disabled]="isSubmitting">
+              {{ isLoginMode ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Iniciar sesión' }}
+            </ion-button>
+          </div>
         </form>
       </ion-card-content>
     </ion-card>
