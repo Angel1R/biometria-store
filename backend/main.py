@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+import hashlib
+from fastapi import FastAPI, HTTPException, status
 from pymongo import MongoClient
 from sentence_transformers import SentenceTransformer
 from pydantic import BaseModel
@@ -23,19 +24,71 @@ client = MongoClient(MONGO_URI)
 db = client["ecommerce_db"]
 collection = db["products"]
 interactions_collection = db["user_interactions"]
+users_collection = db["users"] # <-- NUEVA COLECCIÓN PARA USUARIOS
 
 # --- CARGA DEL MODELO DE IA ---
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 
-# --- MODELO DE DATOS PARA RECIBIR DESDE IONIC ---
+# --- MODELOS DE DATOS ---
 class Interaction(BaseModel):
     user_id: str
     product_id: int
     interaction_type: str # Opciones: 'view', 'cart', 'purchase'
 
+class UserRegister(BaseModel):
+    name: str
+    email: str
+    password: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
 @app.get("/")
 def home():
     return {"mensaje": "API de biometriaStore funcionando correctamente 🚀"}
+
+# --- RUTA DE REGISTRO ---
+@app.post("/auth/register")
+def register_user(user: UserRegister):
+    # Verificar si el correo ya existe
+    existing_user = users_collection.find_one({"email": user.email.lower()})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="El correo ya está registrado.")
+    
+    nuevo_usuario = {
+        "user_id": f"usr_{hashlib.md5(user.email.encode()).hexdigest()[:8]}", # ID único
+        "name": user.name,
+        "email": user.email.lower(),
+        "password": hash_password(user.password),
+        "created_at": datetime.utcnow()
+    }
+    
+    users_collection.insert_one(nuevo_usuario)
+    return {
+        "mensaje": "Usuario registrado exitosamente", 
+        "user_id": nuevo_usuario["user_id"], 
+        "name": nuevo_usuario["name"]
+    }
+
+# --- RUTA DE LOGIN ---
+@app.post("/auth/login")
+def login_user(user: UserLogin):
+    # Buscar al usuario
+    db_user = users_collection.find_one({"email": user.email.lower()})
+    
+    if not db_user or db_user["password"] != hash_password(user.password):
+        raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos.")
+        
+    return {
+        "mensaje": "Inicio de sesión exitoso", 
+        "user_id": db_user["user_id"], 
+        "name": db_user["name"],
+        "email": db_user["email"]
+    }
 
 # --- RUTA 1: GUARDAR INTERACCIONES ---
 @app.post("/interact/")

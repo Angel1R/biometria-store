@@ -28,6 +28,16 @@ export class ApiService {
     );
   }
 
+  // Auth: Registrar Usuario
+  registerUser(data: any): Observable<any> {
+    return this.http.post(`${this.url}/auth/register`, data);
+  }
+
+  // Auth: Login
+  loginUser(data: any): Observable<any> {
+    return this.http.post(`${this.url}/auth/login`, data);
+  }
+
   // Registrar interacción (El "Me gusta" o "Añadir al carrito")
   // 👇 AQUÍ ESTÁ EL CAMBIO: 'number' en lugar de 'int'
   registerInteraction(userId: string, productId: number, type: string): Observable<any> {

@@ -1,13 +1,91 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>login</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="login-page">
+  <div class="login-shell">
+    <section class="brand-panel">
+      <ion-chip class="brand-chip" color="light">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        <ion-label>BiometriaStore</ion-label>
+      </ion-chip>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">login</ion-title>
-    </ion-toolbar>
-  </ion-header>
+      <h1>Inicia sesion y personaliza tu vitrina</h1>
+      <p class="intro-copy">
+        Guarda tus gustos, recupera tu sesion y mejora las recomendaciones de la tienda.
+      </p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <ion-icon name="finger-print-outline"></ion-icon>
+          <span>Tu sesion se guarda en este dispositivo para el demo.</span>
+        </div>
+        <div class="feature-item">
+          <ion-icon name="sparkles-outline"></ion-icon>
+          <span>El catalogo se adapta a tus interacciones.</span>
+        </div>
+      </div>
+    </section>
+
+    <ion-card class="login-card">
+      <ion-card-content>
+        <div class="card-copy">
+          <p class="eyebrow">Acceso</p>
+          <h2>{{ isLoginMode ? 'Entrar a la app' : 'Crear nueva cuenta' }}</h2>
+          <p>{{ isLoginMode ? 'Usa tus datos para abrir la experiencia personalizada.' : 'Regístrate para guardar tus gustos y opciones.' }}</p>
+        </div>
+
+        <div class="mode-switch-container" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+          <ion-label style="margin-right: 15px;">Iniciar sesión</ion-label>
+          <ion-toggle [checked]="!isLoginMode" (ionChange)="onToggleChange($event)" color="primary"></ion-toggle>
+          <ion-label style="margin-left: 15px;">Registrarme</ion-label>
+        </div>
+
+        <form #loginForm="ngForm" (ngSubmit)="submit(loginForm)" novalidate>
+
+          <ion-list lines="none">
+            
+            <ng-container *ngIf="!isLoginMode">
+              <ion-item class="custom-input">
+                <ion-input label="Nombre" labelPlacement="stacked" type="text" name="name" [(ngModel)]="credentials.name" placeholder="Ej. Juanito" required></ion-input>
+              </ion-item>
+              <ion-text color="danger" class="ion-padding-start" *ngIf="submitted && !credentials.name.trim()">
+                <small>Ingresa tu nombre.</small>
+              </ion-text>
+            </ng-container>
+
+            <ion-item class="custom-input">
+              <ion-input label="Correo" labelPlacement="stacked" type="email" name="email" [(ngModel)]="credentials.email" placeholder="correo@ejemplo.com" required email></ion-input>
+            </ion-item>
+            <ion-text color="danger" class="ion-padding-start" *ngIf="submitted && !loginForm.controls['email']?.valid">
+              <small>Ingresa un correo valido.</small>
+            </ion-text>
+
+            <ion-item class="custom-input">
+              <ion-input label="Contraseña" labelPlacement="stacked" type="password" name="password" [(ngModel)]="credentials.password" placeholder="Minimo 6 caracteres" required minlength="6">
+                <!-- Toggle nativo de Ionic 8 para contraseñas -->
+                <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+              </ion-input>
+            </ion-item>
+            <ion-text color="danger" class="ion-padding-start" *ngIf="submitted && !loginForm.controls['password']?.valid">
+              <small>Minimo 6 caracteres requeridos.</small>
+            </ion-text>
+
+          </ion-list>
+
+          <ion-text color="danger" *ngIf="errorMessage">
+            <p class="ion-text-center"><strong>{{ errorMessage }}</strong></p>
+          </ion-text>
+
+          <ion-button type="submit" expand="block" color="primary" class="ion-margin-top" [disabled]="isSubmitting" style="margin-top: 30px;">
+            <ion-spinner name="crescent" *ngIf="isSubmitting"></ion-spinner>
+            <span *ngIf="!isSubmitting">{{ isLoginMode ? 'Iniciar sesion' : 'Registrarse' }}</span>
+          </ion-button>
+
+          <!-- BOTÓN DE INGRESO CON BIOMETRÍA -->
+          <ion-button *ngIf="isLoginMode && canUseBiometrics" type="button" expand="block" fill="outline" color="dark" style="margin-top: 15px;" (click)="loginWithBiometrics()" [disabled]="isSubmitting">
+            <ion-icon name="finger-print-outline" slot="start"></ion-icon>
+            Ingresar con Huella/Rostro
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
+

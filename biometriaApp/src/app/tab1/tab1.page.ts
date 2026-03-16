@@ -14,6 +14,7 @@ import { heart, heartOutline, cubeOutline, sparkles, cartOutline } from 'ionicon
 })
 export class Tab1Page implements OnInit {
   productos: any[] = [];
+  isLoading: boolean = false; // <-- VARIABLE DE CARGA
   
   // Memoria dinámica para los corazones que presiona el usuario
   likedProducts = new Set<number>(); 
@@ -45,24 +46,31 @@ export class Tab1Page implements OnInit {
     if (idGuardado) {
       this.userId = idGuardado; // Ya lo conocemos
     } else {
-      // Como aún no hacemos la pantalla de Login, le generamos un ID único temporal
-      // Ejemplo: "user_a7b9c2"
+      // Como respaldo, pero ahora con el login real no debería pasar por aquí.
       this.userId = 'user_' + Math.random().toString(36).substring(2, 10);
-      localStorage.setItem('biometria_user_id', this.userId); // Lo guardamos en su celular
     }
     console.log('👤 Sesión activa para el usuario:', this.userId);
   }
 
   // --- LÓGICA DE BÚSQUEDA ---
   cargarProductos(busqueda: string | null | undefined) {
-    if (!busqueda || !busqueda.trim()) return;
+    if (!busqueda || !busqueda.trim()) {
+      // Si el buscador está vacío, cargamos recomendaciones por defecto
+      // para que nunca se quede la pantalla en blanco
+      busqueda = 'tecnología'; 
+    }
 
+    this.isLoading = true; // Empieza a cargar
     this.api.getProducts(busqueda).subscribe({
       next: (res) => {
         this.productos = res.resultados;
+        this.isLoading = false; // Termina de cargar
         console.log('👀 Datos completos de un producto:', this.productos[0]);
       },
-      error: (err) => console.error('Error cargando productos', err)
+      error: (err) => {
+        console.error('Error cargando productos', err);
+        this.isLoading = false; // Termina de cargar (incluso en error)
+      }
     });
   }
 
@@ -102,9 +110,22 @@ export class Tab1Page implements OnInit {
     return Math.round(score * 100);
   }
 
+  agregarAlCarrito(productoId: number) {
+    this.api.registerInteraction(this.userId, productoId, 'cart').subscribe({
+      next: () => {
+        console.log(`🛒 Producto ${productoId} agregado al carrito con éxito`);
+        // Aquí podrías agregar una alerta o un toast de Ionic para notificar al usuario
+      },
+      error: (err) => console.error('Error al agregar al carrito', err)
+    });
+    this.cerrarDetalle();
+  }
+
   // Actualizamos el toggleLike para evitar que abra el modal
-  toggleLike(productoId: number, event: Event) {
-    event.stopPropagation(); // <--- ESTO ES CLAVE para no abrir el modal al dar like
+  toggleLike(productoId: number, event?: Event) {
+    if (event) {
+      event.stopPropagation(); // Evitar que el click se propague si viene de la tarjeta
+    }
     
     if (this.likedProducts.has(productoId)) {
       this.likedProducts.delete(productoId);

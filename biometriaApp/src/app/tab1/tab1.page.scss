@@ -299,3 +299,24 @@ ion-col {
 
 ion-col ion-card {
   width: 100%;  }
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-bottom: 2rem;
+
+  .modal-like-btn {
+    margin: 0;
+    height: 3.5rem;
+    width: 3.5rem;
+    --border-width: 2px;
+    --border-color: #e5e9f2;
+  }
+
+  .buy-button {
+    flex: 1;
+    margin: 0;
+    height: 3.5rem;
+  }
+}
+
