@@ -31,99 +31,61 @@
           <p>{{ isLoginMode ? 'Usa tus datos para abrir la experiencia personalizada.' : 'Regístrate para guardar tus gustos y opciones.' }}</p>
         </div>
 
+        <div class="mode-switch-container" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+          <ion-label style="margin-right: 15px;">Iniciar sesión</ion-label>
+          <ion-toggle [checked]="!isLoginMode" (ionChange)="onToggleChange($event)" color="primary"></ion-toggle>
+          <ion-label style="margin-left: 15px;">Registrarme</ion-label>
+        </div>
+
         <form #loginForm="ngForm" (ngSubmit)="submit(loginForm)" novalidate>
-          
-          <!-- Mostrar "Nombre" solo si es Registro -->
-          @if (!isLoginMode) {
-          <div class="field-group">
-            <ion-item class="input-item" lines="none">
-              <ion-label position="stacked">Nombre</ion-label>
-              <ion-input
-                name="name"
-                [(ngModel)]="credentials.name"
-                autocomplete="name"
-                placeholder="Ej. Sergio"
-                required>
+
+          <ion-list lines="none">
+            
+            <ng-container *ngIf="!isLoginMode">
+              <ion-item class="custom-input">
+                <ion-input label="Nombre" labelPlacement="stacked" type="text" name="name" [(ngModel)]="credentials.name" placeholder="Ej. Juanito" required></ion-input>
+              </ion-item>
+              <ion-text color="danger" class="ion-padding-start" *ngIf="submitted && !credentials.name.trim()">
+                <small>Ingresa tu nombre.</small>
+              </ion-text>
+            </ng-container>
+
+            <ion-item class="custom-input">
+              <ion-input label="Correo" labelPlacement="stacked" type="email" name="email" [(ngModel)]="credentials.email" placeholder="correo@ejemplo.com" required email></ion-input>
+            </ion-item>
+            <ion-text color="danger" class="ion-padding-start" *ngIf="submitted && !loginForm.controls['email']?.valid">
+              <small>Ingresa un correo valido.</small>
+            </ion-text>
+
+            <ion-item class="custom-input">
+              <ion-input label="Contraseña" labelPlacement="stacked" type="password" name="password" [(ngModel)]="credentials.password" placeholder="Minimo 6 caracteres" required minlength="6">
+                <!-- Toggle nativo de Ionic 8 para contraseñas -->
+                <ion-input-password-toggle slot="end"></ion-input-password-toggle>
               </ion-input>
             </ion-item>
-            @if (submitted && !credentials.name.trim()) {
-              <ion-note color="danger">Ingresa tu nombre.</ion-note>
-            }
-          </div>
-          }
+            <ion-text color="danger" class="ion-padding-start" *ngIf="submitted && !loginForm.controls['password']?.valid">
+              <small>Minimo 6 caracteres requeridos.</small>
+            </ion-text>
 
-          <div class="field-group">
-            <ion-item class="input-item" lines="none">
-              <ion-label position="stacked">Correo</ion-label>
-              <ion-input
-                name="email"
-                [(ngModel)]="credentials.email"
-                type="email"
-                inputmode="email"
-                autocomplete="email"
-                placeholder="correo@ejemplo.com"
-                required
-                email>
-              </ion-input>
-            </ion-item>
-            @if (submitted && !loginForm.controls['email']?.valid) {
-              <ion-note color="danger">Ingresa un correo valido.</ion-note>
-            }
-          </div>
+          </ion-list>
 
-          <div class="field-group">
-            <ion-item class="input-item" lines="none">
-              <ion-label position="stacked">Contrasena</ion-label>
-              <ion-input
-                name="password"
-                [(ngModel)]="credentials.password"
-                [type]="showPassword ? 'text' : 'password'"
-                autocomplete="current-password"
-                placeholder="Minimo 6 caracteres"
-                minlength="6"
-                required>
-              </ion-input>
+          <ion-text color="danger" *ngIf="errorMessage">
+            <p class="ion-text-center"><strong>{{ errorMessage }}</strong></p>
+          </ion-text>
 
-              <ion-button
-                type="button"
-                fill="clear"
-                color="medium"
-                slot="end"
-                aria-label="Mostrar u ocultar contrasena"
-                (click)="togglePasswordVisibility()">
-                <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
-              </ion-button>
-            </ion-item>
-            @if (submitted && !loginForm.controls['password']?.valid) {
-              <ion-note color="danger">La contrasena debe tener al menos 6 caracteres.</ion-note>
-            }
-          </div>
-
-          @if (errorMessage) {
-            <div class="error-banner">{{ errorMessage }}</div>
-          }
-
-          <ion-button
-            type="submit"
-            expand="block"
-            shape="round"
-            class="submit-button"
-            [disabled]="isSubmitting">
-            @if (isSubmitting) {
-              <ion-spinner slot="start" name="crescent"></ion-spinner>
-            } @else {
-              <ion-icon slot="start" name="log-in-outline"></ion-icon>
-            }
-            {{ isSubmitting ? 'Procesando...' : (isLoginMode ? 'Iniciar sesion' : 'Registrarse') }}
+          <ion-button type="submit" expand="block" color="primary" class="ion-margin-top" [disabled]="isSubmitting" style="margin-top: 30px;">
+            <ion-spinner name="crescent" *ngIf="isSubmitting"></ion-spinner>
+            <span *ngIf="!isSubmitting">{{ isLoginMode ? 'Iniciar sesion' : 'Registrarse' }}</span>
           </ion-button>
 
-          <div class="toggle-mode" style="margin-top: 1rem; text-align: center;">
-            <ion-button fill="clear" color="medium" (click)="toggleMode()" type="button" [disabled]="isSubmitting">
-              {{ isLoginMode ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Iniciar sesión' }}
-            </ion-button>
-          </div>
+          <!-- BOTÓN DE INGRESO CON BIOMETRÍA -->
+          <ion-button *ngIf="isLoginMode && canUseBiometrics" type="button" expand="block" fill="outline" color="dark" style="margin-top: 15px;" (click)="loginWithBiometrics()" [disabled]="isSubmitting">
+            <ion-icon name="finger-print-outline" slot="start"></ion-icon>
+            Ingresar con Huella/Rostro
+          </ion-button>
         </form>
       </ion-card-content>
     </ion-card>
   </div>
 </ion-content>
+

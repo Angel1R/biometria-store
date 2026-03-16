@@ -1,142 +1,76 @@
-.login-page {
-  --background: linear-gradient(160deg, #f7efe3 0%, #fefbf5 45%, #dfe8f5 100%);
+.login-page { --background: linear-gradient(160deg, #f7efe3 0%, #fefbf5 45%, #dfe8f5 100%); }
+.login-shell { min-height: 100%; padding: 2rem 1.25rem; display: flex; flex-direction: column; }
+.brand-panel { color: #162338; margin-bottom: 1.5rem; }
+.brand-chip { --background: rgba(255, 255, 255, 0.7); --color: #162338; margin-bottom: 1rem; font-weight: bold; }
+.brand-panel h1 { margin: 0 0 0.5rem; font-size: 2.2rem; line-height: 1.1; font-weight: 800; letter-spacing: -0.5px; }
+.intro-copy { margin: 0 0 1.5rem; color: #41536b; font-size: 1rem; line-height: 1.4; }
+
+.feature-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+.feature-item { display: flex; align-items: flex-start; gap: 0.5rem; color: #51637b; font-size: 0.9rem; }
+.feature-item ion-icon { font-size: 1.2rem; color: #8d5b36; flex-shrink: 0; }
+
+.login-card { 
+  margin: 0; 
+  border-radius: 24px; 
+  background: #ffffff; 
+  box-shadow: 0px 8px 24px rgba(0,0,0,0.08); 
+  flex-grow: 1;
 }
 
-.login-shell {
-  min-height: 100%;
-  display: grid;
-  gap: 1.5rem;
-  padding: 2rem 1.25rem;
-  align-items: center;
+ion-card-content {
+  padding: 1.5rem;
 }
 
-.brand-panel {
-  color: #162338;
-}
+.card-copy { margin-bottom: 1.5rem; }
+.eyebrow { margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #8d5b36; letter-spacing: 1px; }
+.card-copy h2 { margin: 0 0 0.5rem; color: #162338; font-size: 1.5rem; font-weight: 700; }
+.card-copy p { margin: 0; color: #51637b; font-size: 0.95rem; line-height: 1.4; }
 
-.brand-chip {
-  --background: rgba(255, 255, 255, 0.7);
-  --color: #162338;
-  margin-bottom: 1rem;
-}
+/* Ajustar inputs para Ionic 8 */
+ion-list { background: transparent; padding: 0; margin-bottom: 1rem; }
 
-.brand-panel h1 {
-  margin: 0;
-  font-size: clamp(2rem, 5vw, 3.4rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-
-.intro-copy {
-  max-width: 34rem;
-  margin: 1rem 0 0;
-  color: #41536b;
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-.feature-list {
-  display: grid;
-  gap: 0.9rem;
-  margin-top: 1.5rem;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: #23354d;
-  font-size: 0.95rem;
-}
-
-.feature-item ion-icon {
-  font-size: 1.2rem;
-  color: #c56b2e;
-}
-
-.login-card {
-  margin: 0;
-  border-radius: 28px;
-  box-shadow: 0 24px 80px rgba(22, 35, 56, 0.16);
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(18px);
-}
-
-.card-copy {
-  margin-bottom: 1.5rem;
-}
-
-.eyebrow {
-  margin: 0 0 0.45rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #8d5b36;
-}
-
-.card-copy h2 {
-  margin: 0;
-  color: #162338;
-  font-size: 1.8rem;
-}
-
-.card-copy p {
-  margin: 0.5rem 0 0;
-  color: #55657a;
-  line-height: 1.5;
-}
-
-.field-group {
-  display: grid;
-  gap: 0.45rem;
-  margin-bottom: 1rem;
-}
-
-.input-item {
-  --background: #ffffff;
+.custom-input {
+  --background: #f4f5f8;
   --border-radius: 12px;
   --padding-start: 1rem;
-  --inner-padding-end: 0.5rem;
-  --highlight-color-focused: #c56b2e;
-  --color: #162338;
-  border: 1px solid #c0c9d6;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  --inner-padding-end: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
 }
 
-.input-item ion-input {
-  --placeholder-color: #68798e;
-  --placeholder-opacity: 1;
-  --color: #111a28;
+ion-input {
+  --color: #162338;
+  --placeholder-color: #9aa5b5;
+  font-weight: 500;
   font-size: 1rem;
 }
 
-.input-item ion-label {
-  color: #314259;
+ion-input::part(label) {
+  color: #51637b;
+  font-weight: 500;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+}
+
+/* Ajustes de botones */
+ion-button {
+  --border-radius: 12px;
   font-weight: 600;
-  font-size: 0.9rem;
+  margin: 0;
 }
 
-.error-banner {
-  margin: 0.75rem 0 1rem;
-  padding: 0.8rem 0.95rem;
-  border-radius: 16px;
-  background: rgba(189, 41, 57, 0.08);
-  color: #9e1f30;
-  font-size: 0.92rem;
+ion-button[type="submit"] {
+  --background: #162338;
+  --color: #ffffff;
+  --box-shadow: 0 4px 12px rgba(22, 35, 56, 0.2);
+  height: 48px;
+  margin-bottom: 1rem;
 }
 
-.submit-button {
+ion-button[fill="outline"] {
+  --border-color: #d1d8e0;
+  --color: #162338;
+  --border-width: 1.5px;
+  height: 48px;
   margin-top: 1rem;
-  --background: linear-gradient(135deg, #c56b2e 0%, #ea9b41 100%);
-  --background-activated: linear-gradient(135deg, #b15d28 0%, #d3842e 100%);
-  --border-radius: 999px;
-  font-weight: 700;
-  min-height: 3.25rem;
-}
-
-@media (min-width: 960px) {
-  .login-shell {
-    grid-template-columns: minmax(0, 1.1fr) minmax(360px, 480px);
-    padding: 3rem;
-  }
 }
