@@ -320,3 +320,14 @@ ion-col ion-card {
   }
 }
 
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.recomendado-card {
+  min-width: 160px;
+  border-radius: 16px;
+}
