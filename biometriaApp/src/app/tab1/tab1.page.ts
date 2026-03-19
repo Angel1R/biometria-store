@@ -1,6 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
-import { CurrencyPipe } from '@angular/common'; 
+import { 
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonCardContent,
+  IonButton,
+  IonIcon,
+  IonBadge,
+  IonSearchbar,
+  IonModal, IonSkeletonText } from '@ionic/angular/standalone';import { CurrencyPipe, CommonModule } from '@angular/common'; 
 import { ApiService } from '../services/api';
 import { addIcons } from 'ionicons';
 import { heart, heartOutline, cubeOutline, sparkles, cartOutline } from 'ionicons/icons';
@@ -10,19 +26,38 @@ import { heart, heartOutline, cubeOutline, sparkles, cartOutline } from 'ionicon
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   standalone: true,
-  imports: [IonicModule, CurrencyPipe], 
-})
-export class Tab1Page implements OnInit {
-  productos: any[] = [];
-  isLoading: boolean = false; // <-- VARIABLE DE CARGA
-  
-  // Memoria dinámica para los corazones que presiona el usuario
-  likedProducts = new Set<number>(); 
-  
-  // La variable del usuario ahora arranca vacía, se llenará dinámicamente
-  userId: string = ''; 
+  imports: [IonSkeletonText, 
+    CommonModule,
+    CurrencyPipe,
 
-  // Nuevas variables para el Modal de Detalle
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent,
+    IonButton,
+    IonIcon,
+    IonBadge,
+    IonSearchbar,
+    IonModal
+]})
+export class Tab1Page implements OnInit {
+
+  productos: any[] = [];
+  recomendados: any[] = [];
+
+  isLoading: boolean = false;
+
+  likedProducts = new Set<number>(); 
+  userId: string = '';
+
   productoSeleccionado: any = null;
   modalAbierto: boolean = false;
 
@@ -34,51 +69,55 @@ export class Tab1Page implements OnInit {
   reopenDelay = 250;
 
   ngOnInit() {
-    this.obtenerUsuarioActual(); // 1. Identificamos quién está usando la app
-    this.cargarProductos('tecnología'); // 2. Le cargamos sus productos
+    this.obtenerUsuarioActual();
+    this.cargarProductos('tecnología');
+    this.cargarRecomendados();
   }
 
-  // --- LÓGICA DE USUARIOS DINÁMICOS ---
   obtenerUsuarioActual() {
-    // Buscamos si este celular/navegador ya tiene una sesión iniciada
     let idGuardado = localStorage.getItem('biometria_user_id');
     
     if (idGuardado) {
-      this.userId = idGuardado; // Ya lo conocemos
+      this.userId = idGuardado;
     } else {
-      // Como respaldo, pero ahora con el login real no debería pasar por aquí.
       this.userId = 'user_' + Math.random().toString(36).substring(2, 10);
     }
-    console.log('👤 Sesión activa para el usuario:', this.userId);
+
+    console.log('👤 Usuario:', this.userId);
   }
 
-  // --- LÓGICA DE BÚSQUEDA ---
   cargarProductos(busqueda: string | null | undefined) {
     if (!busqueda || !busqueda.trim()) {
-      // Si el buscador está vacío, cargamos recomendaciones por defecto
-      // para que nunca se quede la pantalla en blanco
-      busqueda = 'tecnología'; 
+      busqueda = 'tecnología';
     }
 
-    this.isLoading = true; // Empieza a cargar
+    this.isLoading = true;
+
     this.api.getProducts(busqueda).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.productos = res.resultados;
-        this.isLoading = false; // Termina de cargar
-        console.log('👀 Datos completos de un producto:', this.productos[0]);
+        this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Error cargando productos', err);
-        this.isLoading = false; // Termina de cargar (incluso en error)
+      error: (err: any) => {
+        console.error(err);
+        this.isLoading = false;
       }
     });
   }
 
-  // Función para abrir el detalle
+  cargarRecomendados() {
+    this.api.getUserRecommendations(this.userId).subscribe({
+      next: (res: any) => {
+        this.recomendados = res.recomendaciones || [];
+      },
+      error: (err: any) => console.error(err)
+    });
+  }
+
   abrirDetalle(producto: any) {
     if (this.modalTransition) return;
-    this.modalTransition = true;
 
+    this.modalTransition = true;
     this.productoSeleccionado = producto;
     this.modalAbierto = true;
 
@@ -89,7 +128,6 @@ export class Tab1Page implements OnInit {
     }, this.reopenDelay);
   }
 
-  // Función para cerrar el detalle
   cerrarDetalle() {
     if (this.modalTransition) return;
 
@@ -98,40 +136,32 @@ export class Tab1Page implements OnInit {
 
     setTimeout(() => {
       this.productoSeleccionado = null;
-
-      setTimeout(() => {
-        this.modalTransition = false;
-      }, 150);
+      this.modalTransition = false;
     }, 200);
   }
 
-  // Convertimos el score de la IA (0.64) a porcentaje (64%)
-  obtenerPorcentajeMatch(score: number): number {
-    return Math.round(score * 100);
-  }
-
-  agregarAlCarrito(productoId: number) {
-    this.api.registerInteraction(this.userId, productoId, 'cart').subscribe({
-      next: () => {
-        console.log(`🛒 Producto ${productoId} agregado al carrito con éxito`);
-        // Aquí podrías agregar una alerta o un toast de Ionic para notificar al usuario
-      },
-      error: (err) => console.error('Error al agregar al carrito', err)
-    });
-    this.cerrarDetalle();
-  }
-
-  // Actualizamos el toggleLike para evitar que abra el modal
   toggleLike(productoId: number, event?: Event) {
-    if (event) {
-      event.stopPropagation(); // Evitar que el click se propague si viene de la tarjeta
-    }
-    
+    if (event) event.stopPropagation();
+
     if (this.likedProducts.has(productoId)) {
       this.likedProducts.delete(productoId);
     } else {
       this.likedProducts.add(productoId);
-      this.api.registerInteraction(this.userId, productoId, 'view').subscribe();
+
+      // 🔥 IMPORTANTE
+      this.api.registerInteraction(this.userId, productoId, 'like').subscribe();
+
+      // refrescar recomendaciones
+      this.cargarRecomendados();
     }
+  }
+
+  agregarAlCarrito(productoId: number) {
+    this.api.registerInteraction(this.userId, productoId, 'cart').subscribe();
+    this.cerrarDetalle();
+  }
+
+  obtenerPorcentajeMatch(score: number): number {
+    return Math.round(score * 100);
   }
 }

@@ -49,7 +49,7 @@ def hash_password(password: str) -> str:
 
 @app.get("/")
 def home():
-    return {"mensaje": "API de biometriaStore funcionando correctamente 🚀"}
+    return {"mensaje": "API de biometriaStore funcionando correctamente"}
 
 # --- RUTA DE REGISTRO ---
 @app.post("/auth/register")
@@ -98,6 +98,8 @@ def register_interaction(interaction: Interaction):
         weight = 3
     elif interaction.interaction_type == 'purchase':
         weight = 5
+    elif interaction.interaction_type == 'like':
+        weight = 4  # <- CLAVE
 
     doc = {
         "user_id": interaction.user_id,
@@ -203,7 +205,7 @@ def get_user_recommendations(user_id: str, limit: int = 5):
                 "score": {"$meta": "vectorSearchScore"}
             }
         }
-    ]
+    ] #🥵
     
     resultados = list(collection.aggregate(pipeline))
     
