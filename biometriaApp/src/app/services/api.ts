@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private url = environment.apiUrl;
+  // CORRECCIÓN: Usamos tu IP de ipconfig para que el celular físico encuentre la laptop
+  private url = 'http://192.168.18.15:5000';
 
   constructor(private http: HttpClient) { }
 
@@ -15,7 +15,6 @@ export class ApiService {
     return this.http.get(`${this.url}/recommendations/?query=${query}&limit=20`);
   }
 
-  // ✅ NOMBRE CORRECTO
   getUserRecommendations(userId: string): Observable<any> {
     return this.http.get(`${this.url}/recommendations/user/${userId}`);
   }

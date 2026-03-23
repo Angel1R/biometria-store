@@ -8,9 +8,9 @@ import {
   IonButton, IonSpinner 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { fingerPrintOutline, logInOutline, sparklesOutline } from 'ionicons/icons';
+import { fingerPrintOutline, logInOutline, sparklesOutline, fingerPrint, sparkles, handRightOutline, starOutline } from 'ionicons/icons';
 import { ApiService } from '../services/api';
-import { NativeBiometric } from '@capgo/capacitor-native-biometric';
+import { NativeBiometric } from 'capacitor-native-biometric';
 
 @Component({
   selector: 'app-login',
@@ -25,151 +25,100 @@ import { NativeBiometric } from '@capgo/capacitor-native-biometric';
   ]
 })
 export class LoginPage implements OnInit {
-  credentials = {
-    name: '',
-    email: '',
-    password: '',
-  };
-
-  isLoginMode = true; // Toggle para saber si es Login o Registro
+  credentials = { name: '', email: '', password: '' };
+  isLoginMode = true;
   submitted = false;
   isSubmitting = false;
   errorMessage = '';
   canUseBiometrics = false;
 
   constructor(private router: Router, private apiService: ApiService) {
-    addIcons({
-      fingerPrintOutline,
-      logInOutline,
-      sparklesOutline,
-    });
+    addIcons({ fingerPrintOutline, logInOutline, sparklesOutline, fingerPrint, sparkles, handRightOutline, starOutline });
   }
 
   async ngOnInit() {
-    // Comprobar si el dispositivo soporta biometría (FaceID / Huella)
     try {
       const result = await NativeBiometric.isAvailable();
       this.canUseBiometrics = result.isAvailable;
     } catch (e) {
-      console.log('La biometría no está disponible en este entorno', e);
       this.canUseBiometrics = false;
     }
   }
 
   async loginWithBiometrics() {
     try {
-      // Intentar recuperar el correo del último usuario que ingresó exitosamente
       const lastEmail = localStorage.getItem('biometria_last_email');
-      
       if (!lastEmail) {
-        this.errorMessage = 'No hay un usuario previo guardado para usar biometría. Inicia sesión primero con contraseña.';
+        this.errorMessage = 'Inicia sesión con contraseña primero.';
         return;
       }
-
-      // Lanzar el prompt nativo de Android/iOS
       await NativeBiometric.verifyIdentity({
-        reason: "Verifica tu identidad para entrar a BiometriaStore",
-        title: "Acceso Seguro",
-        subtitle: "Usa tu huella o rostro",
-        description: "Accede rápidamente a tus recomendaciones"
+        reason: "Acceso Seguro a BiometriaStore",
+        title: "Identidad Requerida",
       });
-
-      // Si pasa la identidad nativa, lo simulamos como acceso exitoso para la app
-      // En un entorno real as de máxima seguridad usaríamos Capacitor Secure Storage
-      // para encriptar y desencriptar la contraseña.
       this.isSubmitting = true;
       this.handleSuccess({
-        user_id: localStorage.getItem('biometria_last_user_id') || 'usr_biometric_demo',
-        name: localStorage.getItem('biometria_last_name') || 'Usuario Biometría',
+        user_id: localStorage.getItem('biometria_last_user_id') || 'usr_demo',
+        name: localStorage.getItem('biometria_last_name') || 'Usuario',
         email: lastEmail
       });
-
     } catch (error) {
-      console.error('Error o cancelación en biometría:', error);
-      this.errorMessage = 'La autenticación biométrica falló o fue cancelada.';
+      this.errorMessage = 'Biometría cancelada o fallida.';
     }
   }
 
   onToggleChange(event: any) {
-    // Si el toggle está activo (true), significa que es Registro (isLoginMode = false)
-    this.isLoginMode = !event.detail.checked;
-    this.submitted = false;
+    this.isLoginMode = event.detail ? !event.detail.checked : !event;
     this.errorMessage = '';
-    this.credentials = { name: '', email: '', password: '' };
+    this.submitted = false;
   }
 
   async submit(form: NgForm) {
     this.submitted = true;
-    this.errorMessage = '';
-
-    // Validar nombre solo si estamos registrando
-    if (!this.isLoginMode && !this.credentials.name.trim()) {
-      this.errorMessage = 'Completa todos los campos para continuar.';
-      return;
-    }
-
-    if (!form.controls['email']?.valid || !form.controls['password']?.valid) {
-      this.errorMessage = 'Completa los campos correctamente.';
+    if (!form.valid) {
+      this.errorMessage = 'Revisa los datos del formulario.';
       return;
     }
 
     this.isSubmitting = true;
+    this.errorMessage = '';
 
-    try {
-      if (this.isLoginMode) {
-        // --- FLUJO DE INICIO DE SESIÓN ---
-        this.apiService.loginUser({
-          email: this.credentials.email.trim(),
-          password: this.credentials.password
-        }).subscribe({
-          next: async (res) => {
-            this.handleSuccess(res);
-          },
-          error: (err) => {
-            this.errorMessage = err.error?.detail || 'Error al iniciar sesión.';
-            this.isSubmitting = false;
-          }
-        });
-      } else {
-        // --- FLUJO DE REGISTRO ---
-        this.apiService.registerUser({
-          name: this.credentials.name.trim(),
-          email: this.credentials.email.trim(),
-          password: this.credentials.password
-        }).subscribe({
-          next: async (res) => {
-            this.handleSuccess(res);
-          },
-          error: (err) => {
-            this.errorMessage = err.error?.detail || 'Error al registrar usuario.';
-            this.isSubmitting = false;
-          }
-        });
+    const request = this.isLoginMode 
+      ? this.apiService.loginUser({ email: this.credentials.email.trim(), password: this.credentials.password })
+      : this.apiService.registerUser({ name: this.credentials.name.trim(), email: this.credentials.email.trim(), password: this.credentials.password });
+
+    request.subscribe({
+      next: (res) => this.handleSuccess(res),
+      error: (err) => {
+        this.errorMessage = err.error?.detail || 'Error en la conexión.';
+        this.isSubmitting = false;
       }
-    } catch (e) {
-      this.errorMessage = 'Ocurrió un error. Intenta nuevamente.';
-      this.isSubmitting = false;
-    }
+    });
   }
 
   private async handleSuccess(res: any) {
-    localStorage.setItem('biometria_logged_in', 'true');
-    localStorage.setItem('biometria_user_id', res.user_id);
-    localStorage.setItem('biometria_user_name', res.name);
-    
-    // Guardar estos datos extra para usarlos luego en el Login Biométrico
-    localStorage.setItem('biometria_last_user_id', res.user_id);
-    localStorage.setItem('biometria_last_name', res.name);
-
-    if (res.email) {
-      localStorage.setItem('biometria_user_email', res.email);
-      localStorage.setItem('biometria_last_email', res.email);
-    } else {
-      localStorage.setItem('biometria_user_email', this.credentials.email.trim().toLowerCase());
-      localStorage.setItem('biometria_last_email', this.credentials.email.trim().toLowerCase());
-    }
-
-    await this.router.navigateByUrl('/tabs/tab1', { replaceUrl: true });
     this.isSubmitting = false;
+
+    // LA MAGIA ESTÁ AQUÍ: Separamos el Registro del Login
+    if (!this.isLoginMode) {
+      // SI ES REGISTRO: Se queda en la pantalla y te pide iniciar sesión
+      this.isLoginMode = true; 
+      this.credentials.password = ''; // Limpia la clave por seguridad
+      this.submitted = false;
+      this.errorMessage = '¡Registro exitoso! Ahora inicia sesión.'; 
+    } else {
+      // SI ES LOGIN: Guarda tus datos, pide huella y te manda al inicio
+      localStorage.setItem('biometria_last_email', res.email || this.credentials.email);
+      localStorage.setItem('biometria_last_user_id', res.user_id);
+      localStorage.setItem('biometria_last_name', res.name);
+
+      if (this.canUseBiometrics) {
+        try {
+          await NativeBiometric.verifyIdentity({ reason: "Vincula tu huella para entrar rápido" });
+        } catch (e) { }
+      }
+
+      await this.router.navigateByUrl('/tabs/tab1', { replaceUrl: true });
+    }
   }
 }

@@ -9,12 +9,16 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    canActivate: [guestGuard],
+    // Quitamos temporalmente el guard para que te deje ver tu diseño aunque tengas sesión iniciada
     loadComponent: () => import('./login/login.page').then( m => m.LoginPage),
   },
   {
-    path: '',
+    path: 'tabs', // Le damos un nombre propio a la ruta de las pestañas
     canActivate: [authGuard],
     loadChildren: () => import('./tabs/tabs.routes').then((m) => m.routes),
   },
+  {
+    path: '**', // Si escribes cualquier cosa mal, que te mande al login
+    redirectTo: 'login'
+  }
 ];
