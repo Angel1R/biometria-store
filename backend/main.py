@@ -1,4 +1,5 @@
 import hashlib
+import uvicorn
 from fastapi import FastAPI, HTTPException, status
 from pymongo import MongoClient
 from sentence_transformers import SentenceTransformer
@@ -12,7 +13,7 @@ app = FastAPI(title="API biometriaStore")
 # --- CONFIGURACIÓN CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # En producción cambia el "*" por tu dominio real
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,16 +25,18 @@ client = MongoClient(MONGO_URI)
 db = client["ecommerce_db"]
 collection = db["products"]
 interactions_collection = db["user_interactions"]
-users_collection = db["users"] # <-- NUEVA COLECCIÓN PARA USUARIOS
+users_collection = db["users"] 
 
 # --- CARGA DEL MODELO DE IA ---
+print("Cargando modelo de IA... espera un momento.")
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+print("Modelo cargado exitosamente.")
 
 # --- MODELOS DE DATOS ---
 class Interaction(BaseModel):
     user_id: str
     product_id: int
-    interaction_type: str # Opciones: 'view', 'cart', 'purchase'
+    interaction_type: str 
 
 class UserRegister(BaseModel):
     name: str
@@ -54,13 +57,12 @@ def home():
 # --- RUTA DE REGISTRO ---
 @app.post("/auth/register")
 def register_user(user: UserRegister):
-    # Verificar si el correo ya existe
     existing_user = users_collection.find_one({"email": user.email.lower()})
     if existing_user:
         raise HTTPException(status_code=400, detail="El correo ya está registrado.")
     
     nuevo_usuario = {
-        "user_id": f"usr_{hashlib.md5(user.email.encode()).hexdigest()[:8]}", # ID único
+        "user_id": f"usr_{hashlib.md5(user.email.encode()).hexdigest()[:8]}", 
         "name": user.name,
         "email": user.email.lower(),
         "password": hash_password(user.password),
@@ -77,7 +79,6 @@ def register_user(user: UserRegister):
 # --- RUTA DE LOGIN ---
 @app.post("/auth/login")
 def login_user(user: UserLogin):
-    # Buscar al usuario
     db_user = users_collection.find_one({"email": user.email.lower()})
     
     if not db_user or db_user["password"] != hash_password(user.password):
@@ -99,7 +100,7 @@ def register_interaction(interaction: Interaction):
     elif interaction.interaction_type == 'purchase':
         weight = 5
     elif interaction.interaction_type == 'like':
-        weight = 4  # <- CLAVE
+        weight = 4 
 
     doc = {
         "user_id": interaction.user_id,
@@ -114,15 +115,14 @@ def register_interaction(interaction: Interaction):
     
     return {"mensaje": "Interacción guardada con éxito", "data": doc}
 
-# --- RUTA 2: RECOMENDACIONES GENERALES (Por texto) ---
+# --- RUTA 2: RECOMENDACIONES GENERALES ---
 @app.get("/recommendations/")
 def get_recommendations(query: str, limit: int = 5):
     query_vector = model.encode(query).tolist()
-
     pipeline = [
         {
             "$vectorSearch": {
-                "index": "ecommerce", # <-- CAMBIADO DE 'default' A 'ecommerce'
+                "index": "ecommerce",
                 "path": "vector_embedding",
                 "queryVector": query_vector,
                 "numCandidates": 100,
@@ -141,76 +141,40 @@ def get_recommendations(query: str, limit: int = 5):
             }
         }
     ]
-
     resultados = list(collection.aggregate(pipeline))
     return {"query": query, "resultados": resultados}
 
-# --- RUTA 3: RECOMENDACIONES PERSONALIZADAS POR USUARIO ---
+# --- RUTA 3: PERSONALIZADAS ---
 @app.get("/recommendations/user/{user_id}")
 def get_user_recommendations(user_id: str, limit: int = 5):
     interacciones = list(interactions_collection.find({"user_id": user_id}).limit(20))
-    
     if not interacciones:
-        return {"mensaje": f"El usuario {user_id} es nuevo. Aquí mostraríamos los productos más populares."}
+        return {"mensaje": f"Usuario {user_id} nuevo."}
         
     pesos_por_producto = {}
     for inter in interacciones:
         pid = inter["product_id"]
-        if pid not in pesos_por_producto:
-            pesos_por_producto[pid] = 0
-        pesos_por_producto[pid] += inter["weight"]
+        pesos_por_producto[pid] = pesos_por_producto.get(pid, 0) + inter["weight"]
         
     productos_interactuados = list(collection.find({"product_id": {"$in": list(pesos_por_producto.keys())}}))
-    
     if not productos_interactuados:
-        return {"mensaje": "No se encontraron los datos de los productos."}
+        return {"mensaje": "No hay datos de productos."}
         
-    vectores = []
-    pesos = []
-    for prod in productos_interactuados:
-        pid = prod["product_id"]
-        vectores.append(prod["vector_embedding"])
-        pesos.append(pesos_por_producto[pid])
-        
-    vectores_np = np.array(vectores)
-    pesos_np = np.array(pesos)
-    vector_usuario = np.average(vectores_np, axis=0, weights=pesos_np).tolist()
+    vectores = [p["vector_embedding"] for p in productos_interactuados]
+    pesos = [pesos_por_producto[p["product_id"]] for p in productos_interactuados]
+    vector_usuario = np.average(vectores, axis=0, weights=pesos).tolist()
     
     pipeline = [
-        {
-            "$vectorSearch": {
-                "index": "ecommerce", # <-- CAMBIADO DE 'default' A 'ecommerce'
-                "path": "vector_embedding",
-                "queryVector": vector_usuario,
-                "numCandidates": 100,
-                "limit": limit + len(pesos_por_producto) 
-            }
-        },
-        # --- FILTRO COMENTADO TEMPORALMENTE PARA VER SI ESTO BLOQUEABA LOS RESULTADOS ---
-         {
-             "$match": {
-                 "product_id": {"$nin": list(pesos_por_producto.keys())}
-             }
-         },
-        {
-            "$limit": limit
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "product_id": 1,
-                "title": 1,
-                "category": 1,
-                "price": 1,
-                "score": {"$meta": "vectorSearchScore"}
-            }
-        }
-    ] #🥵
+        {"$vectorSearch": {"index": "ecommerce", "path": "vector_embedding", "queryVector": vector_usuario, "numCandidates": 100, "limit": limit + len(pesos_por_producto)}},
+        {"$match": {"product_id": {"$nin": list(pesos_por_producto.keys())}}},
+        {"$limit": limit},
+        {"$project": {"_id": 0, "product_id": 1, "title": 1, "category": 1, "price": 1, "score": {"$meta": "vectorSearchScore"}}}
+    ]
     
     resultados = list(collection.aggregate(pipeline))
-    
-    return {
-        "usuario": user_id, 
-        "productos_analizados": len(productos_interactuados),
-        "recomendaciones": resultados
-    }
+    return {"usuario": user_id, "recomendaciones": resultados}
+
+# --- BLOQUE DE ARRANQUE (CORREGIDO) ---
+if __name__ == "__main__":
+    # Host 0.0.0.0 permite que el celular vea a la compu en la misma red WiFi
+    uvicorn.run(app, host="0.0.0.0", port=5000)
