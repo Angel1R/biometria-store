@@ -5,225 +5,238 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="profile-content">
-  <div class="profile-shell">
-    <section class="profile-hero">
-      <div class="profile-avatar">
-        <ion-icon name="person-circle-outline"></ion-icon>
+  
+  @if (isPrivateMode()) {
+    <div class="private-mode-overlay animate-fade-in">
+      <div class="private-content">
+        <ion-icon name="eye-off-outline" class="private-icon"></ion-icon>
+        <h2>Modo Privado Activado</h2>
+        <p>Tu información sensible está oculta. La pantalla volverá a la normalidad en unos segundos.</p>
+        <div class="secure-pulse"></div>
       </div>
+    </div>
+  }
 
-      <div class="profile-copy">
-        <p class="eyebrow">CUENTA ACTIVA</p>
-        <h1>{{ user().name }}</h1>
-        <p>{{ user().email || 'Sin correo disponible' }}</p>
-      </div>
-    </section>
-
-    <ion-card class="profile-card">
-      <ion-card-content>
-        <div class="card-header">
-          <div>
-            <p class="card-kicker">Usuario</p>
-            <h2>Datos de perfil</h2>
-          </div>
-          <ion-icon name="mail-outline"></ion-icon>
+  @if (!isPrivateMode()) {
+    <div class="profile-shell">
+      <section class="profile-hero">
+        <div class="profile-avatar">
+          <ion-icon name="person-circle-outline"></ion-icon>
         </div>
 
-        <div class="profile-grid">
-          <div class="profile-field">
-            <span>Nombre</span>
-            <strong>{{ user().name }}</strong>
-          </div>
-          <div class="profile-field">
-            <span>Correo</span>
-            <strong>{{ user().email || 'No disponible' }}</strong>
-          </div>
-          <div class="profile-field full">
-            <span>ID de usuario</span>
-            <strong>{{ user().userId || 'No disponible' }}</strong>
-          </div>
+        <div class="profile-copy">
+          <p class="eyebrow">CUENTA ACTIVA</p>
+          <h1>{{ user().name }}</h1>
+          <p>{{ user().email || 'Sin correo disponible' }}</p>
         </div>
-      </ion-card-content>
-    </ion-card>
+      </section>
 
-    <ion-card class="profile-card face-card">
-      <ion-card-content>
-        <div class="card-header">
-          <div>
-            <p class="card-kicker">Reconocimiento facial</p>
-            <h2>Acceso facial</h2>
+      <ion-card class="profile-card">
+        <ion-card-content>
+          <div class="card-header">
+            <div>
+              <p class="card-kicker">Usuario</p>
+              <h2>Datos de perfil</h2>
+            </div>
+            <ion-icon name="mail-outline"></ion-icon>
           </div>
-          <ion-icon name="sparkles"></ion-icon>
-        </div>
 
-        <p class="card-text">{{ faceSummary() }}</p>
-
-        <div class="status-pill" [class.enabled]="faceRegistered()" [class.unavailable]="!faceAvailable()">
-          @if (faceAvailable()) {
-            <span>{{ faceStatusLabel() }}</span>
-          } @else {
-            <span>No disponible</span>
-          }
-        </div>
-
-        @if (faceAvailable() && !faceRegistered()) {
-          <div class="password-box">
-            <label class="password-label" for="face-password">Contraseña actual</label>
-            <div class="password-field">
-              <ion-icon name="lock-closed-outline"></ion-icon>
-              <input
-                id="face-password"
-                [ngModel]="facePassword()"
-                (ngModelChange)="facePassword.set($event)"
-                type="password"
-                placeholder="Confirma tu contraseña para registrar tu rostro"
-              />
+          <div class="profile-grid">
+            <div class="profile-field">
+              <span>Nombre</span>
+              <strong>{{ user().name }}</strong>
+            </div>
+            <div class="profile-field">
+              <span>Correo</span>
+              <strong>{{ user().email || 'No disponible' }}</strong>
+            </div>
+            <div class="profile-field full">
+              <span>ID de usuario</span>
+              <strong>{{ user().userId || 'No disponible' }}</strong>
             </div>
           </div>
-        }
+        </ion-card-content>
+      </ion-card>
 
-        @if (faceMessage()) {
-          <ion-text [color]="faceMessageColor()">
-            <p class="feedback">{{ faceMessage() }}</p>
-          </ion-text>
-        }
+      <ion-card class="profile-card face-card">
+        <ion-card-content>
+          <div class="card-header">
+            <div>
+              <p class="card-kicker">Reconocimiento facial</p>
+              <h2>Acceso facial</h2>
+            </div>
+            <ion-icon name="sparkles"></ion-icon>
+          </div>
 
-        <div class="actions">
+          <p class="card-text">{{ faceSummary() }}</p>
+
+          <div class="status-pill" [class.enabled]="faceRegistered()" [class.unavailable]="!faceAvailable()">
+            @if (faceAvailable()) {
+              <span>{{ faceStatusLabel() }}</span>
+            } @else {
+              <span>No disponible</span>
+            }
+          </div>
+
           @if (faceAvailable() && !faceRegistered()) {
-            <ion-button
-              expand="block"
-              class="primary-action"
-              [disabled]="isFaceProcessing()"
-              (click)="registerFaceAccess()"
-            >
-              @if (isFaceProcessing()) {
-                <ion-spinner name="crescent"></ion-spinner>
-              } @else {
-                <ion-icon name="sparkles" slot="start"></ion-icon>
-                Registrar acceso facial
-              }
-            </ion-button>
-          }
-
-          @if (faceAvailable() && faceRegistered()) {
-            <ion-button
-              expand="block"
-              fill="outline"
-              color="medium"
-              [disabled]="isFaceProcessing()"
-              (click)="removeFaceAccess()"
-            >
-              @if (isFaceProcessing()) {
-                <ion-spinner name="crescent"></ion-spinner>
-              } @else {
-                <ion-icon name="trash-outline" slot="start"></ion-icon>
-                Quitar acceso facial
-              }
-            </ion-button>
-          }
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card class="profile-card biometric-card">
-      <ion-card-content>
-        <div class="card-header">
-          <div>
-            <p class="card-kicker">Biometria</p>
-            <h2>Acceso biometrico (respaldo)</h2>
-          </div>
-          <ion-icon name="shield-checkmark-outline"></ion-icon>
-        </div>
-
-        <p class="card-text">{{ biometricSummary() }}</p>
-
-        <div class="status-pill" [class.enabled]="biometricEnabled()" [class.unavailable]="!biometricAvailable()">
-          @if (biometricAvailable()) {
-            <span>{{ biometricStatusLabel() }}</span>
-          } @else {
-            <span>No disponible</span>
-          }
-        </div>
-
-        @if (faceAvailable()) {
-          <p class="fallback-note">
-            Este acceso funciona como respaldo si el reconocimiento facial falla.
-          </p>
-        }
-
-        @if (canRegisterBiometrics()) {
-          <div class="password-box">
-            <label class="password-label" for="biometric-password">Contraseña actual</label>
-            <div class="password-field">
-              <ion-icon name="lock-closed-outline"></ion-icon>
-              <input
-                id="biometric-password"
-                [ngModel]="currentPassword()"
-                (ngModelChange)="currentPassword.set($event)"
-                type="password"
-                placeholder="Confirma tu contraseña para registrar biometría"
-              />
+            <div class="password-box">
+              <label class="password-label" for="face-password">Contraseña actual</label>
+              <div class="password-field">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input
+                  id="face-password"
+                  [ngModel]="facePassword()"
+                  (ngModelChange)="facePassword.set($event)"
+                  type="password"
+                  placeholder="Confirma tu contraseña para registrar tu rostro"
+                />
+              </div>
             </div>
+          }
+
+          @if (faceMessage()) {
+            <ion-text [color]="faceMessageColor()">
+              <p class="feedback">{{ faceMessage() }}</p>
+            </ion-text>
+          }
+
+          <div class="actions">
+            @if (faceAvailable() && !faceRegistered()) {
+              <ion-button
+                expand="block"
+                class="primary-action"
+                [disabled]="isFaceProcessing()"
+                (click)="registerFaceAccess()"
+              >
+                @if (isFaceProcessing()) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="sparkles" slot="start"></ion-icon>
+                  Registrar acceso facial
+                }
+              </ion-button>
+            }
+
+            @if (faceAvailable() && faceRegistered()) {
+              <ion-button
+                expand="block"
+                fill="outline"
+                color="medium"
+                [disabled]="isFaceProcessing()"
+                (click)="removeFaceAccess()"
+              >
+                @if (isFaceProcessing()) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="trash-outline" slot="start"></ion-icon>
+                  Quitar acceso facial
+                }
+              </ion-button>
+            }
           </div>
-        }
+        </ion-card-content>
+      </ion-card>
 
-        @if (biometricMessage()) {
-          <ion-text [color]="biometricMessageColor()">
-            <p class="feedback">{{ biometricMessage() }}</p>
-          </ion-text>
-        }
+      <ion-card class="profile-card biometric-card">
+        <ion-card-content>
+          <div class="card-header">
+            <div>
+              <p class="card-kicker">Biometria</p>
+              <h2>Acceso biometrico (respaldo)</h2>
+            </div>
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+          </div>
 
-        <div class="actions">
+          <p class="card-text">{{ biometricSummary() }}</p>
+
+          <div class="status-pill" [class.enabled]="biometricEnabled()" [class.unavailable]="!biometricAvailable()">
+            @if (biometricAvailable()) {
+              <span>{{ biometricStatusLabel() }}</span>
+            } @else {
+              <span>No disponible</span>
+            }
+          </div>
+
+          @if (faceAvailable()) {
+            <p class="fallback-note">
+              Este acceso funciona como respaldo si el reconocimiento facial falla.
+            </p>
+          }
+
           @if (canRegisterBiometrics()) {
-            <ion-button expand="block" class="primary-action" [disabled]="isSavingBiometrics()" (click)="enableBiometrics()">
-              @if (isSavingBiometrics()) {
-                <ion-spinner name="crescent"></ion-spinner>
-              } @else {
-                <ion-icon name="finger-print-outline" slot="start"></ion-icon>
-                {{ registerButtonLabel() }}
-              }
-            </ion-button>
+            <div class="password-box">
+              <label class="password-label" for="biometric-password">Contraseña actual</label>
+              <div class="password-field">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input
+                  id="biometric-password"
+                  [ngModel]="currentPassword()"
+                  (ngModelChange)="currentPassword.set($event)"
+                  type="password"
+                  placeholder="Confirma tu contraseña para registrar biometría"
+                />
+              </div>
+            </div>
           }
 
-          @if (biometricAvailable() && biometricEnabled()) {
-            <ion-button expand="block" fill="outline" color="medium" [disabled]="isSavingBiometrics()" (click)="disableBiometrics()">
-              @if (isSavingBiometrics()) {
-                <ion-spinner name="crescent"></ion-spinner>
-              } @else {
-                <ion-icon name="trash-outline" slot="start"></ion-icon>
-                Quitar biometría de este dispositivo
-              }
-            </ion-button>
+          @if (biometricMessage()) {
+            <ion-text [color]="biometricMessageColor()">
+              <p class="feedback">{{ biometricMessage() }}</p>
+            </ion-text>
           }
-        </div>
-      </ion-card-content>
-    </ion-card>
 
-    <ion-card class="profile-card session-card">
-      <ion-card-content>
-        <div class="card-header">
-          <div>
-            <p class="card-kicker">Sesión</p>
-            <h2>Cerrar sesión</h2>
+          <div class="actions">
+            @if (canRegisterBiometrics()) {
+              <ion-button expand="block" class="primary-action" [disabled]="isSavingBiometrics()" (click)="enableBiometrics()">
+                @if (isSavingBiometrics()) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="finger-print-outline" slot="start"></ion-icon>
+                  {{ registerButtonLabel() }}
+                }
+              </ion-button>
+            }
+
+            @if (biometricAvailable() && biometricEnabled()) {
+              <ion-button expand="block" fill="outline" color="medium" [disabled]="isSavingBiometrics()" (click)="disableBiometrics()">
+                @if (isSavingBiometrics()) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="trash-outline" slot="start"></ion-icon>
+                  Quitar biometría de este dispositivo
+                }
+              </ion-button>
+            }
           </div>
-          <ion-icon name="log-out-outline"></ion-icon>
-        </div>
+        </ion-card-content>
+      </ion-card>
 
-        <p class="card-text">
-          Al cerrar sesión se borrará tu acceso actual, pero el acceso facial o biométrico que registres seguirá disponible en este dispositivo para volver a entrar desde el login.
-        </p>
+      <ion-card class="profile-card session-card">
+        <ion-card-content>
+          <div class="card-header">
+            <div>
+              <p class="card-kicker">Sesión</p>
+              <h2>Cerrar sesión</h2>
+            </div>
+            <ion-icon name="log-out-outline"></ion-icon>
+          </div>
 
-        <ion-button expand="block" color="danger" [disabled]="isLoggingOut()" (click)="logout()">
-          @if (isLoggingOut()) {
-            <ion-spinner name="crescent"></ion-spinner>
-          } @else {
-            <ion-icon name="log-out-outline" slot="start"></ion-icon>
-            Cerrar sesión
-          }
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
-    
-    <!-- Espaciador adicional al final para que el tab bar no cubra el último botón -->
-    <div style="height: 80px;"></div>
-  </div>
+          <p class="card-text">
+            Al cerrar sesión se borrará tu acceso actual, pero el acceso facial o biométrico que registres seguirá disponible en este dispositivo para volver a entrar desde el login.
+          </p>
+
+          <ion-button expand="block" color="danger" [disabled]="isLoggingOut()" (click)="logout()">
+            @if (isLoggingOut()) {
+              <ion-spinner name="crescent"></ion-spinner>
+            } @else {
+              <ion-icon name="log-out-outline" slot="start"></ion-icon>
+              Cerrar sesión
+            }
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+      
+      <div style="height: 80px;"></div>
+    </div>
+  }
 </ion-content>
