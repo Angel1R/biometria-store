@@ -7,11 +7,14 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
+  eyeOffOutline, // Añadido para el modo privado
   fingerPrintOutline, lockClosedOutline, logOutOutline, mailOutline,
   personCircleOutline, shieldCheckmarkOutline, sparkles, trashOutline,
 } from 'ionicons/icons';
 import { firstValueFrom } from 'rxjs';
 import { Camera } from '@capacitor/camera'; // 🔥 PLUGIN NATIVO DE CAPACITOR PARA LA RÚBRICA
+import { Motion } from '@capacitor/motion';
+import { PluginListenerHandle } from '@capacitor/core';
 
 import { NativeBiometricService } from '../auth/native-biometric.service';
 import { SessionService, type SessionUser } from '../auth/session.service';
@@ -55,6 +58,12 @@ export class Tab3Page implements OnInit {
   faceMessage = signal('');
   faceMessageColor = signal<'success' | 'danger' | 'medium'>('medium');
 
+  // --- VARIABLES PARA EL MODO PRIVADO ---
+  isPrivateMode = signal(false); // Convertido a Signal
+  private accelHandler?: PluginListenerHandle;
+  private isCooldown = false;
+  private privateModeTimeout?: any;
+
   // 🔥 RÚBRICA: Valores reactivos computados
   registerButtonLabel = computed(() => `Registrar ${this.biometricLabel()}`);
   canRegisterBiometrics = computed(() => this.biometricAvailable() && !this.biometricEnabled());
@@ -85,6 +94,7 @@ export class Tab3Page implements OnInit {
     addIcons({
       fingerPrintOutline, lockClosedOutline, logOutOutline, mailOutline,
       personCircleOutline, shieldCheckmarkOutline, sparkles, trashOutline,
+      eyeOffOutline // Añadimos el icono del ojo cerrado
     });
   }
 
@@ -94,9 +104,68 @@ export class Tab3Page implements OnInit {
     await this.bindBiometryListener();
   }
 
+  // Se ejecuta CUANDO LA PÁGINA ES COMPLETAMENTE VISIBLE
+  async ionViewDidEnter() {
+    await this.iniciarDetectorMovimiento();
+  }
+
+  // Se ejecuta JUSTO ANTES DE SALIR DE LA PÁGINA
+  async ionViewWillLeave() {
+    await this.detenerDetectorMovimiento();
+  }
+
   async ionViewWillEnter() {
     await this.loadProfileState();
     await this.loadFaceState();
+  }
+
+  // --- LÓGICA DEL ACELERÓMETRO ---
+  private async iniciarDetectorMovimiento() {
+    try {
+      if (typeof (DeviceMotionEvent as any)?.requestPermission === 'function') {
+        const permissionState = await (DeviceMotionEvent as any).requestPermission();
+        if (permissionState !== 'granted') return;
+      }
+
+      this.accelHandler = await Motion.addListener('accel', (event) => {
+        const z = event.accelerationIncludingGravity.z || 0;
+
+        if (z < -7 && !this.isPrivateMode() && !this.isCooldown) {
+          this.activarModoPrivado();
+        }
+      });
+    } catch (error) {
+      console.warn('El acelerómetro no está disponible en este dispositivo', error);
+    }
+  }
+
+  private async detenerDetectorMovimiento() {
+    if (this.accelHandler) {
+      await this.accelHandler.remove();
+      this.accelHandler = undefined;
+    }
+    if (this.privateModeTimeout) {
+      clearTimeout(this.privateModeTimeout);
+    }
+    this.isPrivateMode.set(false);
+    this.isCooldown = false;
+  }
+
+  private activarModoPrivado() {
+    this.isPrivateMode.set(true);
+    console.log('🛡️ Modo Privado Activado');
+
+    this.privateModeTimeout = setTimeout(() => {
+      this.isPrivateMode.set(false);
+      this.isCooldown = true;
+      console.log('👁️ Modo Privado Terminado - Iniciando Cooldown');
+
+      setTimeout(() => {
+        this.isCooldown = false;
+        console.log('✅ Cooldown Terminado - Listo para detectar de nuevo');
+      }, 3000);
+
+    }, 7000);
   }
 
   async enableBiometrics() {
@@ -190,11 +259,10 @@ export class Tab3Page implements OnInit {
         if (request.camera !== 'granted') {
           this.setFaceMessage('Permiso de cámara denegado. Es obligatorio para la biometría.', 'danger');
           this.isFaceProcessing.set(false);
-          return; // Manejo seguro sin crashear la aplicación
+          return;
         }
       }
 
-      // Validar contraseña primero
       await firstValueFrom(
         this.apiService.loginUser({
           email: currentUser.email,
@@ -202,7 +270,6 @@ export class Tab3Page implements OnInit {
         })
       );
 
-      // Usar cámara nativa a través de tu servicio
       const imageBase64 = await this.faceRecognitionService.captureFaceBase64();
       
       await firstValueFrom(
