@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, 
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, 
   IonButton, IonIcon, IonBadge, IonSearchbar, IonModal, IonSkeletonText,
-  IonInfiniteScroll, IonInfiniteScrollContent 
+  IonInfiniteScroll, IonInfiniteScrollContent, IonRefresher, IonRefresherContent
 } from '@ionic/angular/standalone';
 import { CurrencyPipe, CommonModule } from '@angular/common'; 
 import { ApiService } from '../services/api';
@@ -20,10 +20,10 @@ import { heart, heartOutline, cubeOutline, sparkles, cartOutline } from 'ionicon
     IonSkeletonText, CommonModule, CurrencyPipe, IonHeader, IonToolbar, IonTitle, 
     IonContent, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, 
     IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonBadge, IonSearchbar, 
-    IonModal, IonInfiniteScroll, IonInfiniteScrollContent
+    IonModal, IonInfiniteScroll, IonInfiniteScrollContent, IonRefresher, IonRefresherContent
   ]
 })
-export class Tab1Page implements OnInit {
+export class Tab1Page implements OnInit, OnDestroy {
   private cartService = inject(CartService);
   private api = inject(ApiService);
 
@@ -37,6 +37,8 @@ export class Tab1Page implements OnInit {
   productoSeleccionado = signal<any>(null);
   modalAbierto = signal<boolean>(false);
   modalTransition = false;
+  ultimaCategoriaMostrada = '';
+  private refreshRecommendationTimers: number[] = [];
 
   // Categorías para dar el efecto "orgánico"
   categoriasRandom = ['tecnología', 'muebles', 'ropa', 'zapatos', 'relojes', 'hogar', 'deportes', 'accesorios'];
@@ -53,12 +55,16 @@ export class Tab1Page implements OnInit {
       error: (err: any) => console.error('Error cargando likes:', err)
     });
 
-    this.cargarProductos(this.obtenerCategoriaAzar());
+    this.cargarProductos(this.obtenerCategoriaAzarDiferente());
     this.cargarRecomendados();
   }
 
   ionViewWillEnter() {
     if (this.userId) this.cargarRecomendados();
+  }
+
+  ngOnDestroy() {
+    this.limpiarTemporizadoresRecomendados();
   }
 
   obtenerUsuarioActual() {
@@ -75,8 +81,24 @@ export class Tab1Page implements OnInit {
     return this.categoriasRandom[Math.floor(Math.random() * this.categoriasRandom.length)];
   }
 
+  obtenerCategoriaAzarDiferente(): string {
+    if (this.categoriasRandom.length <= 1) {
+      const unicaCategoria = this.categoriasRandom[0] || 'tecnología';
+      this.ultimaCategoriaMostrada = unicaCategoria;
+      return unicaCategoria;
+    }
+
+    let nuevaCategoria = this.obtenerCategoriaAzar();
+    while (nuevaCategoria === this.ultimaCategoriaMostrada) {
+      nuevaCategoria = this.obtenerCategoriaAzar();
+    }
+
+    this.ultimaCategoriaMostrada = nuevaCategoria;
+    return nuevaCategoria;
+  }
+
   cargarProductos(busqueda: string | null | undefined, esInfiniteScroll: boolean = false, event?: any) {
-    if (!busqueda || !busqueda.trim()) busqueda = this.obtenerCategoriaAzar();
+    if (!busqueda || !busqueda.trim()) busqueda = this.obtenerCategoriaAzarDiferente();
 
     if (!esInfiniteScroll) this.isLoading.set(true);
 
@@ -89,6 +111,8 @@ export class Tab1Page implements OnInit {
         } else {
           this.productos.set(res.resultados);
         }
+
+        if (event) event.target.complete();
         this.isLoading.set(false);
       },
       error: (err: any) => {
@@ -102,7 +126,12 @@ export class Tab1Page implements OnInit {
   // 🔥 RÚBRICA CUMPLIDA: Infinite Scroll
   cargarMasProductos(event: any) {
     // Al hacer scroll, busca otra categoría al azar para dar sensación de descubrimiento orgánico
-    this.cargarProductos(this.obtenerCategoriaAzar(), true, event);
+    this.cargarProductos(this.obtenerCategoriaAzarDiferente(), true, event);
+  }
+
+  refrescarTienda(event: any) {
+    this.cargarProductos(this.obtenerCategoriaAzarDiferente(), false, event);
+    this.cargarRecomendados();
   }
 
   cargarRecomendados() {
@@ -110,6 +139,24 @@ export class Tab1Page implements OnInit {
       next: (res: any) => this.recomendados.set(res.recomendaciones || []),
       error: (err: any) => console.error(err)
     });
+  }
+
+  actualizarRecomendadosConReintento() {
+    // Disparamos de inmediato y luego dos reintentos cortos para captar
+    // cambios del backend que puedan tardar unos instantes tras un "like".
+    this.cargarRecomendados();
+    this.limpiarTemporizadoresRecomendados();
+
+    const delays = [600, 1400];
+    delays.forEach((delay) => {
+      const timerId = window.setTimeout(() => this.cargarRecomendados(), delay);
+      this.refreshRecommendationTimers.push(timerId);
+    });
+  }
+
+  limpiarTemporizadoresRecomendados() {
+    this.refreshRecommendationTimers.forEach((timerId) => window.clearTimeout(timerId));
+    this.refreshRecommendationTimers = [];
   }
 
   abrirDetalle(producto: any) {
@@ -143,8 +190,10 @@ export class Tab1Page implements OnInit {
       this.likedProducts.delete(productoId);
     } else {
       this.likedProducts.add(productoId);
+      this.actualizarRecomendadosConReintento();
       this.api.registerInteraction(this.userId, productoId, 'like').subscribe({
-        next: () => this.cargarRecomendados()
+        next: () => this.actualizarRecomendadosConReintento(),
+        error: (err: any) => console.error(err)
       });
     }
   }

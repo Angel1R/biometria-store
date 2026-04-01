@@ -1,6 +1,6 @@
 /* FORZAMOS EL MODO CLARO Y LIMPIO */
 ion-content.custom-light-bg {
-  --background: #f8f9fa;
+  --background: #ffffff;
 }
 
 /* CLASE MAESTRA DE JUSTIFICACIÓN */
@@ -22,7 +22,7 @@ ion-content.custom-light-bg {
   }
   &:after {
     z-index: 1; content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 20vh;
-    background-image: linear-gradient(0deg, #f8f9fa 0%, rgba(248, 249, 250, 0) 100%);
+    background-image: linear-gradient(0deg, #ffffff 0%, rgba(255, 255, 255, 0) 100%);
   }
 }
 
@@ -35,7 +35,7 @@ ion-content.custom-light-bg {
   align-self: flex-end;
   width: 1em; height: 1em;
   transform: translateY(100%);
-  background: linear-gradient(135deg, rgba(47,128,237,0.3), rgba(86,204,242,0.3)); 
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.3), rgba(0, 123, 255, 0.12));
   border-radius: 12px;
   
   &:nth-child(2) { height: 1.5em; width: 3em; animation-delay: 1s; animation-duration: 17s; filter: blur(5px); }
@@ -77,24 +77,24 @@ ion-content.custom-light-bg {
   display: flex; flex-direction: column; align-items: center; margin-bottom: 15px;
   
   h3 {
-    font-size: 26px; font-weight: 800; color: #111; margin: 15px 0 0 0; letter-spacing: -0.5px;
-    span { color: #2f80ed; font-weight: 400; }
+    font-size: 26px; font-weight: 800; color: #1a1a1b; margin: 15px 0 0 0; letter-spacing: -0.5px;
+    span { color: #007bff; font-weight: 400; }
   }
 }
 
 .icon-stack {
   position: relative; width: 75px; height: 75px;
-  background: linear-gradient(135deg, #2f80ed, #56ccf2);
+  background: linear-gradient(135deg, #007bff, #007bff);
   border-radius: 22px; 
   display: flex; justify-content: center; align-items: center;
-  box-shadow: 0 10px 25px rgba(47, 128, 237, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 123, 255, 0.35);
 }
 
 .finger-icon { font-size: 45px; color: white; }
 
 .ai-overlay-icon {
   position: absolute; top: -8px; right: -8px; font-size: 28px;
-  color: #ffdf00; 
+  color: #ffc107;
 }
 
 /* ANIMACIONES DEL LOGO */
@@ -117,8 +117,8 @@ ion-content.custom-light-bg {
 
 /* TEXTOS DE CABECERA JERÁRQUICOS Y JUSTIFICADOS */
 .header-text-block {
-  h1 { font-size: 30px; font-weight: 800; margin-bottom: 10px; color: #111; letter-spacing: -0.8px; }
-  p { font-size: 15px; color: #666; margin: 0; }
+  h1 { font-size: 30px; font-weight: 800; margin-bottom: 10px; color: #1a1a1b; letter-spacing: -0.8px; }
+  p { font-size: 15px; color: #4b5563; margin: 0; }
 }
 
 .feature-item {
@@ -127,13 +127,13 @@ ion-content.custom-light-bg {
 }
 
 .feature-icon {
-  font-size: 22px; color: #2f80ed; margin-right: 10px;
+  font-size: 22px; color: #007bff; margin-right: 10px;
 }
 
 /* TARJETA DE CRISTAL BLANCO */
 .glass-card {
-  background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 1); border-radius: 24px;
+  background: rgba(248, 249, 250, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid #f8f9fa; border-radius: 24px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); margin: 0 20px;
   padding: 10px 0;
 }
@@ -141,9 +141,9 @@ ion-content.custom-light-bg {
 /* SECCIÓN DE ACCESO JUSTIFICADA */
 .access-section {
   padding: 0 15px; margin-bottom: 15px;
-  .access-label { font-size: 13px; font-weight: 700; color: #2f80ed; margin: 0; }
-  .access-title { font-size: 24px; font-weight: 800; color: #111; margin: 5px 0 0 0; }
-  .access-description { font-size: 14px; color: #777; margin: 0; }
+  .access-label { font-size: 13px; font-weight: 700; color: #007bff; margin: 0; }
+  .access-title { font-size: 24px; font-weight: 800; color: #1a1a1b; margin: 5px 0 0 0; }
+  .access-description { font-size: 14px; color: #4b5563; margin: 0; }
 }
 
 /* BARRA DE ENLACES AUTORIZACIÓN JUSTIFICADA */
@@ -163,7 +163,7 @@ ion-content.custom-light-bg {
 }
 
 .auth-switch.active {
-  color: #2f80ed;
+  color: #007bff;
   font-weight: 800;
 }
 
@@ -180,7 +180,7 @@ ion-content.custom-light-bg {
 
 .input-label {
   display: block;
-  color: #555;
+  color: #1a1a1b;
   font-weight: 600;
   text-align: justify;
   margin-bottom: 8px;
@@ -192,7 +192,7 @@ ion-content.custom-light-bg {
   border: 0;
   outline: none;
   background: transparent;
-  color: #111;
+  color: #1a1a1b;
   font: inherit;
   padding: 0;
 }
@@ -204,7 +204,7 @@ ion-content.custom-light-bg {
 .native-input:-webkit-autofill,
 .native-input:-webkit-autofill:hover,
 .native-input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #111;
+  -webkit-text-fill-color: #1a1a1b;
   transition: background-color 9999s ease-out 0s;
 }
 
@@ -228,7 +228,7 @@ ion-content.custom-light-bg {
   border: 0;
   padding: 0;
   background: transparent;
-  color: #2f80ed;
+  color: #007bff;
   cursor: pointer;
 }
 
@@ -237,7 +237,7 @@ ion-content.custom-light-bg {
 }
 
 .password-toggle:focus-visible {
-  outline: 2px solid rgba(47, 128, 237, 0.45);
+  outline: 2px solid rgba(0, 123, 255, 0.45);
   outline-offset: 2px;
   border-radius: 50%;
 }
@@ -247,24 +247,36 @@ ion-content.custom-light-bg {
    ========================================= */
 .submit-btn {
   margin-top: 25px; margin-left: 15px; margin-right: 15px;
-  --background: linear-gradient(90deg, #2f80ed, #56ccf2);
-  --box-shadow: 0 4px 15px rgba(47, 128, 237, 0.3); 
-  font-weight: bold; color: white;
+  --background: linear-gradient(90deg, #007bff, #007bff);
+  --color: #ffffff;
+  --box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+  font-weight: bold;
+
+  ion-icon {
+    color: #ffffff;
+  }
   
   transition: transform 0.1s ease-in-out, --box-shadow 0.1s ease-in-out;
 
   &:active {
     transform: scale(0.96);
-    --box-shadow: 0 1px 5px rgba(47, 128, 237, 0.5); 
+    --box-shadow: 0 1px 5px rgba(0, 123, 255, 0.5);
   }
 }
 
 .face-btn {
   margin-top: 10px;
-  color: #2f80ed;
+  --color: #007bff;
+  color: #007bff;
   font-weight: 700;
   padding: 0 15px;
 }
 
-.bio-btn { margin-top: 4px; color: #555; font-weight: 600; padding: 0 15px; }
+.bio-btn {
+  margin-top: 4px;
+  --color: #1a1a1b;
+  color: #1a1a1b;
+  font-weight: 600;
+  padding: 0 15px;
+}
 .status-msg { font-weight: 600; margin-top: 10px; padding: 0 15px; text-align: center; }

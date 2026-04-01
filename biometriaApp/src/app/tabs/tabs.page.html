@@ -10,7 +10,7 @@
       <ion-icon name="cart-outline"></ion-icon>
       <ion-label>Carrito</ion-label>
       @if (cartService.cartItems().length > 0) {
-        <ion-badge color="danger">{{ cartService.cartItems().length }}</ion-badge>
+        <ion-badge color="warning">{{ cartService.cartItems().length }}</ion-badge>
       }
     </ion-tab-button>
 

@@ -8,23 +8,24 @@
   height: 65px;
   
   // Efecto Glassmorphism
-  background: rgba(255, 255, 255, 0.9); 
+  background: #f8f9fa;
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   
   // Estética
   border-radius: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(26, 26, 27, 0.08);
+  box-shadow: 0 10px 25px rgba(26, 26, 27, 0.12);
   
   --border: 0;
   overflow: visible;
 }
 
 ion-tab-button {
-  --color: #8e8e93; // Color inactivo
-  --color-selected: var(--ion-color-primary);
+  --color: #1a1a1b;
+  --color-selected: #007bff;
   background: transparent;
+  opacity: 0.72;
 
   ion-icon {
     font-size: 26px;
@@ -38,6 +39,8 @@ ion-tab-button {
   }
 
   &.tab-selected {
+    opacity: 1;
+
     ion-icon {
       transform: translateY(-2px) scale(1.1);
     }
@@ -57,4 +60,6 @@ ion-badge {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #1a1a1b;
+  font-weight: 700;
 }

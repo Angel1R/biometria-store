@@ -1,8 +1,8 @@
 /* --- VARIABLES LOCALES --- */
 :host {
-  --app-bg: #f8f9fc;
-  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  --card-bg: rgba(255, 255, 255, 0.9);  }
+  --app-bg: #ffffff;
+  --primary-gradient: linear-gradient(135deg, #007bff 0%, #007bff 100%);
+  --card-bg: #f8f9fa;  }
 
 /* --- FONDOS Y TEXTOS --- */
 .custom-bg {
@@ -25,12 +25,12 @@
 .welcome-text {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #1f2937;
+  color: #1a1a1b;
   margin: 0 0 4px 0;
 }
 
 .sub-text {
-  color: #6b7280;
+  color: #4b5563;
   font-size: 0.95rem;
   margin: 0 0 16px 0;
 }
@@ -50,9 +50,9 @@
   --background: #ffffff;
   --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   --border-radius: 20px;
-  --icon-color: #6366f1;
+  --icon-color: #007bff;
 
-  --color: #1f2937;          /* color del texto */
+  --color: #1a1a1b;          /* color del texto */
   --placeholder-color: #9ca3af;
   
   padding: 0;   }
@@ -113,7 +113,7 @@
     border-radius: 12px;
     padding: 6px 12px;
     font-weight: 600;
-    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }}
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); }}
 
 .custom-header {
   padding: 16px 16px 8px 16px;
@@ -121,7 +121,7 @@
   .product-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #374151;
+    color: #1a1a1b;
     /* Truncar texto a 2 líneas */
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -133,7 +133,7 @@
   .product-price {
     font-size: 1.25rem;
     font-weight: 800;
-    color: #6366f1;
+    color: #28a745;
     margin-top: 8px;    }}
 
 /* --- BOTÓN ME GUSTA INTERACTIVO --- */
@@ -141,15 +141,15 @@
   padding: 0 16px 16px 16px;
 
   .like-button {
-    --background: rgba(99, 102, 241, 0.1); /* Fondo base suave */
-    --color: #6366f1; /* Letra azul/morada */
+    --background: rgba(0, 123, 255, 0.1); /* Fondo base suave */
+    --color: #007bff; /* Letra azul principal */
     --box-shadow: none;
     font-weight: 700;
     letter-spacing: 0.5px;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Transición de rebote */
 
     .heart-icon {
-      color: #9ca3af; /* Gris por defecto (outline) */
+      color: #6b7280; /* Gris por defecto (outline) */
       transition: color 0.3s ease, transform 0.3s ease; }
 
     &:active {
@@ -157,11 +157,11 @@
 
     /* ESTADO ACTIVO: Cuando el usuario ya le dio like */
     &.active-like {
-      --background: rgba(236, 72, 153, 0.15); /* Fondo rosado suave */
-      --color: #be185d; /* Letra rosada oscura */
+      --background: rgba(255, 193, 7, 0.2); /* Fondo ámbar suave */
+      --color: #1a1a1b;
 
       .heart-icon {
-        color: #ec4899; /* Corazón relleno rosado brillante */
+        color: #ffc107;
         animation: heartPop 0.4s ease forwards; }}}}
 
 /* Animación del latido del corazón */
@@ -178,12 +178,12 @@
 
   .empty-icon {
     font-size: 80px;
-    color: #a855f7;
+    color: #ffc107;
     margin-bottom: 20px;
     opacity: 0.8;   }
   
   h3 {
-    color: #374151;
+    color: #1a1a1b;
     font-weight: 700;   }}
 
 /* --- ANIMACIONES GLOBALES --- */
@@ -216,7 +216,7 @@ ion-modal.custom-bottom-sheet::part(backdrop) {
   position: relative;
   width: 100%;
   height: 250px;
-  background: #f8f9fc;
+  background: #f8f9fa;
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -235,8 +235,8 @@ ion-modal.custom-bottom-sheet::part(backdrop) {
     position: absolute;
     top: -10px;
     right: 15px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
+    background: #ffc107;
+    color: #1a1a1b;
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 0.85rem;
@@ -244,7 +244,7 @@ ion-modal.custom-bottom-sheet::part(backdrop) {
     display: flex;
     align-items: center;
     gap: 5px;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }}
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.35); }}
 
 @keyframes imageReveal {
   0% {
@@ -264,14 +264,14 @@ ion-modal.custom-bottom-sheet::part(backdrop) {
   .modal-title {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #1f2937;
+    color: #1a1a1b;
     margin: 0 0 10px 0;
     line-height: 1.2;   }
 
   .modal-price {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #6366f1;
+    color: #28a745;
     margin: 0;  }
 
   .divider {
@@ -282,11 +282,11 @@ ion-modal.custom-bottom-sheet::part(backdrop) {
   .section-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #4b5563;
+    color: #1a1a1b;
     margin-bottom: 10px;    }
 
   .modal-description {
-    color: #6b7280;
+    color: #4b5563;
     line-height: 1.6;
     font-size: 1rem;    }}
 
@@ -301,9 +301,16 @@ ion-modal.custom-bottom-sheet::part(backdrop) {
 
   .buy-button {
     --background: var(--primary-gradient);
+    --color: #ffffff;
     font-weight: 700;
     font-size: 1.1rem;
-    --box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);  }}
+    --box-shadow: 0 10px 20px rgba(0, 123, 255, 0.3);
+
+    ion-icon {
+      color: #ffffff;
+    }
+  }
+}
 
 ion-col {
   display: flex;    }
@@ -321,7 +328,7 @@ ion-col ion-card {
     height: 3.5rem;
     width: 3.5rem;
     --border-width: 2px;
-    --border-color: #e5e9f2;
+    --border-color: #d1d5db;
   }
 
   .buy-button {
@@ -350,7 +357,7 @@ ion-col ion-card {
   border-radius: 18px;
   flex: 0 0 auto;
   scroll-snap-align: start;
-  background: #ffffff;
+  background: #f8f9fa;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(0, 0, 0, 0.02);
   display: flex;
@@ -376,7 +383,7 @@ ion-col ion-card {
 
   ion-card-content.recomendado-content {
     padding: 12px;
-    background: #ffffff;
+    background: #f8f9fa;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -385,7 +392,7 @@ ion-col ion-card {
     h3 {
       font-size: 0.95rem;
       font-weight: 700;
-      color: #374151;
+      color: #1a1a1b;
       margin: 0 0 6px 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -398,7 +405,7 @@ ion-col ion-card {
     .price {
       font-size: 1.15rem;
       font-weight: 800;
-      color: #6366f1;
+      color: #28a745;
       margin: auto 0 8px 0;
     }
 
@@ -406,8 +413,8 @@ ion-col ion-card {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
+      background: #ffc107;
+      color: #1a1a1b;
       padding: 4px 8px;
       border-radius: 12px;
       align-self: flex-start;

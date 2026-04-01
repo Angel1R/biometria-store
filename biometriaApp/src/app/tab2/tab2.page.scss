@@ -1,11 +1,13 @@
-$brand-purple: #5d5fef;
-$bg-light: #f8f9fa;
-$text-dark: #2d3142;
-$text-medium: #8e8e93;
+$brand-primary: #007bff;
+$brand-success: #28a745;
+$bg-light: #ffffff;
+$card-bg: #f8f9fa;
+$text-dark: #1a1a1b;
+$text-medium: #6b7280;
 
 .cart-title {
   font-weight: 800;
-  color: $brand-purple;
+  color: $brand-primary;
   font-size: 1.3rem;
 }
 
@@ -52,7 +54,7 @@ $text-medium: #8e8e93;
 .cart-card {
   display: flex;
   align-items: center;
-  background: #ffffff;
+  background: $card-bg;
   border-radius: 16px;
   padding: 12px;
   margin-bottom: 16px;
@@ -88,7 +90,7 @@ $text-medium: #8e8e93;
   .item-price {
     margin: 0;
     font-weight: 800;
-    color: $brand-purple;
+    color: $brand-success;
     font-size: 1rem;
   }
 
@@ -145,7 +147,7 @@ $text-medium: #8e8e93;
   margin-bottom: 12px;
 
   ion-label {
-    color: $brand-purple;
+    color: $brand-primary;
     font-weight: bold;
     font-size: 1rem;
   }
@@ -158,7 +160,8 @@ $text-medium: #8e8e93;
 }
 
 .btn-pay {
-  --background: #{$brand-purple};
+  --background: #{$brand-primary};
+  --color: #ffffff;
   height: 50px;
   font-weight: bold;
   margin-top: 10px;
@@ -169,7 +172,7 @@ $text-medium: #8e8e93;
 }
 
 .total-container {
-  background: #ffffff;
+  background: $card-bg;
   padding: 20px 16px 30px 16px;
   border-radius: 24px 24px 0 0;
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
@@ -191,11 +194,12 @@ $text-medium: #8e8e93;
 .total-amount {
   font-size: 1.6rem;
   font-weight: 900;
-  color: $brand-purple;
+  color: $brand-success;
 }
 
 .btnConfirmar {
-  --background: #{$brand-purple};
+  --background: #{$brand-primary};
+  --color: #ffffff;
   font-weight: bold;
   font-size: 1rem;
   height: 52px;

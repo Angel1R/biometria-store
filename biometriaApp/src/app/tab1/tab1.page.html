@@ -7,6 +7,13 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding custom-bg">
+  <ion-refresher slot="fixed" (ionRefresh)="refrescarTienda($event)">
+    <ion-refresher-content
+      pullingText="Desliza para actualizar"
+      refreshingSpinner="circles"
+      refreshingText="Buscando nuevos productos...">
+    </ion-refresher-content>
+  </ion-refresher>
   
   <div class="search-container">
     <h2 class="welcome-text">¿Qué estás buscando hoy?</h2>
