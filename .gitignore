@@ -1,0 +1,50 @@
+# --- Python / Backend ---
+backend/venv/
+backend/.venv/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Ionic / Angular ---
+node_modules/
+biometriaApp/node_modules/
+.sourcemaps/
+.pnp/
+.pnp.js
+
+# --- Compilación y Salida ---
+biometriaApp/www/
+biometriaApp/dist/
+biometriaApp/build/
+biometriaApp/platforms/
+biometriaApp/plugins/
+biometriaApp/android/
+biometriaApp/ios/
+*.log
+*.temp
+
+# --- Archivos Grandes y Binarios ---
+*.dll
+*.exe
+*.so
+*.dylib
+*.bin
+*.pickle
+*.h5
+*.onnx
+
+# --- Editores y Sistema Operativo ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp

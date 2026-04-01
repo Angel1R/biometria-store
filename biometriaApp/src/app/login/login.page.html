@@ -1,0 +1,172 @@
+<ion-content [fullscreen]="true" class="custom-light-bg">
+  <div class="background-container">
+    <div class="squares">
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+    </div>
+  </div>
+
+  <div class="login-container">
+    <div class="header-section">
+      <div class="logo-wrapper floating-logo">
+        <div class="icon-stack">
+          <ion-icon name="finger-print" class="finger-icon"></ion-icon>
+          <ion-icon name="sparkles" class="ai-overlay-icon sparkling-animation"></ion-icon>
+        </div>
+        <h3>Biometria<span>Store</span></h3>
+      </div>
+
+      <div class="header-text-block justified-text">
+        <h1></h1>
+
+        <p>Guarda tus gustos, recupera tu sesion y mejora las recomendaciones de la tienda.</p>
+
+        <div class="feature-item justified-text">
+          <ion-icon name="hand-right-outline" class="feature-icon"></ion-icon>
+          <p>Tu sesion se guarda en este dispositivo para el demo.</p>
+        </div>
+
+        <div class="feature-item justified-text">
+          <ion-icon name="star-outline" class="feature-icon"></ion-icon>
+          <p>El catalogo se adapta a tus interacciones.</p>
+        </div>
+      </div>
+    </div>
+
+    <ion-card class="glass-card">
+      <ion-card-content>
+        <form #f="ngForm" (ngSubmit)="submit(f, $event)">
+          <div class="access-section justified-text">
+            <p class="access-label">ACCESO</p>
+            <h2 class="access-title">Entrar a la app</h2>
+            <p class="access-description">Usa tus datos para abrir la experiencia personalizada.</p>
+          </div>
+
+          <div class="auth-bar justified-text">
+            <button
+              class="auth-switch"
+              type="button"
+              [class.active]="isLoginMode"
+              (click)="setAuthMode('login')"
+            >
+              Iniciar sesion
+            </button>
+            <span class="auth-bullet">|</span>
+            <button
+              class="auth-switch"
+              type="button"
+              [class.active]="!isLoginMode"
+              (click)="setAuthMode('register')"
+            >
+              Registrarme
+            </button>
+          </div>
+
+          @if (!isLoginMode) {
+            <div class="input-item">
+              <label class="input-label" [attr.for]="fieldIds.name">Nombre</label>
+              <input
+                class="native-input"
+                [id]="fieldIds.name"
+                type="text"
+                name="name"
+                [(ngModel)]="credentials.name"
+                placeholder="Ej. Ian"
+                autocomplete="name"
+                required
+              />
+            </div>
+          }
+
+          <div class="input-item">
+            <label class="input-label" [attr.for]="fieldIds.email">Correo: correo@ejemplo.com</label>
+            <input
+              class="native-input"
+              [id]="fieldIds.email"
+              type="email"
+              name="email"
+              [(ngModel)]="credentials.email"
+              placeholder="tu@correo.com"
+              [attr.autocomplete]="isLoginMode ? 'username' : 'email'"
+              inputmode="email"
+              required
+            />
+          </div>
+
+          <div class="input-item">
+            <label class="input-label" [attr.for]="fieldIds.password">Contrasena: minimo 6 caracteres</label>
+            <div class="password-field">
+              <input
+                class="native-input"
+                [id]="fieldIds.password"
+                [type]="showPassword ? 'text' : 'password'"
+                name="password"
+                [(ngModel)]="credentials.password"
+                placeholder="******"
+                [attr.autocomplete]="isLoginMode ? 'current-password' : 'new-password'"
+                minlength="6"
+                required
+              />
+              <button
+                class="password-toggle"
+                type="button"
+                [attr.aria-label]="showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'"
+                (click)="togglePasswordVisibility()"
+              >
+                <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          @if (errorMessage) {
+            <ion-text [color]="isLoginMode ? 'danger' : 'success'">
+              <p class="status-msg justified-text">{{ errorMessage }}</p>
+            </ion-text>
+          }
+
+          <ion-button expand="block" type="submit" [disabled]="isSubmitting" class="submit-btn" shape="round">
+            @if (isSubmitting) {
+              <ion-spinner name="crescent"></ion-spinner>
+            } @else {
+              <span>{{ isLoginMode ? 'INICIAR SESION' : 'REGISTRARME' }}</span>
+            }
+          </ion-button>
+
+          @if (isLoginMode && faceLoginAvailable) {
+            <ion-button
+              expand="block"
+              fill="clear"
+              (click)="loginWithFace()"
+              class="face-btn justified-text"
+              [disabled]="isSubmitting"
+            >
+              <ion-icon name="sparkles" slot="start"></ion-icon>
+              Entrar con reconocimiento facial
+            </ion-button>
+          }
+
+          @if (isLoginMode && biometricLoginEnabled) {
+            <ion-button
+              expand="block"
+              fill="clear"
+              (click)="loginWithBiometrics()"
+              class="bio-btn justified-text"
+              [disabled]="isSubmitting"
+            >
+              <ion-icon name="finger-print-outline" slot="start"></ion-icon>
+              Entrar con {{ biometricLabel }} (respaldo)
+            </ion-button>
+          }
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

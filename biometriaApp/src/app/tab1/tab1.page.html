@@ -1,0 +1,188 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
+    <ion-title class="gradient-text font-bold">
+      BiometriaStore
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding custom-bg">
+  
+  <div class="search-container">
+    <h2 class="welcome-text">¿Qué estás buscando hoy?</h2>
+    <p class="sub-text">Nuestra IA te recomendará lo mejor.</p>
+    <ion-searchbar 
+      class="premium-search" 
+      animated="true" 
+      mode="ios"
+      placeholder="Ej. Tecnología, Ropa, Laptops..." 
+      debounce="250"
+      (ionInput)="cargarProductos($any($event.target).value)">
+    </ion-searchbar>
+  </div>
+
+  @if (recomendados().length > 0) {
+    <div class="recomendados-section">
+      <h2 class="welcome-text">✨ Recomendado para ti</h2>
+      <p class="sub-text">Basado en lo que te gusta</p>
+
+      <div class="horizontal-scroll">
+        @for (rec of recomendados(); track rec.product_id) {
+          <ion-card class="recomendado-card" (click)="abrirDetalle(rec)">
+            <img [src]="rec.thumbnail" />
+
+            <ion-card-content>
+              <h3>{{ rec.title }}</h3>
+              <p>{{ rec.price | currency:'USD' }}</p>
+              <small>{{ obtenerPorcentajeMatch(rec.score) }}% match IA</small>
+            </ion-card-content>
+          </ion-card>
+        }
+      </div>
+    </div>
+  }
+
+  <ion-grid>
+    <ion-row>
+      
+      @if (isLoading()) {
+        @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+          <ion-col size="6" size-md="4" size-xl="3">
+            <ion-card class="premium-card">
+              <div class="image-wrapper" style="padding-top: 100%;">
+                <ion-skeleton-text animated style="position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover;"></ion-skeleton-text>
+              </div>
+              <ion-card-header class="custom-header">
+                <ion-card-title class="product-title">
+                  <ion-skeleton-text animated style="width: 80%; height: 1.2rem; border-radius: 4px;"></ion-skeleton-text>
+                </ion-card-title>
+                <ion-card-subtitle class="product-price">
+                  <ion-skeleton-text animated style="width: 40%; height: 1rem; border-radius: 4px;"></ion-skeleton-text>
+                </ion-card-subtitle>
+              </ion-card-header>
+              <div class="card-action">
+                <ion-skeleton-text animated style="width: 100%; height: 2.5rem; border-radius: 99px;"></ion-skeleton-text>
+              </div>
+            </ion-card>
+          </ion-col>
+        }
+      } @else {
+        @for (prod of productos(); track prod.product_id; let i = $index) {
+          <ion-col size="6" size-md="4" size-xl="3">
+  
+            <ion-card 
+              class="premium-card animate-fade-up"
+              [style.animation-delay]="(i * 0.1) + 's'"
+              (click)="!modalTransition && abrirDetalle(prod)">
+  
+              <div class="image-wrapper">
+                <img [src]="prod.thumbnail" [alt]="prod.title" loading="lazy" />
+                <ion-badge color="primary" class="category-badge">
+                  {{ prod.category }}
+                </ion-badge>
+              </div>
+  
+              <ion-card-header class="custom-header">
+                <ion-card-title class="product-title">
+                  {{ prod.title }}
+                </ion-card-title>
+  
+                <ion-card-subtitle class="product-price">
+                  {{ prod.price | currency:'USD' }}
+                </ion-card-subtitle>
+              </ion-card-header>
+  
+              <div class="card-action">
+                <ion-button
+                  class="like-button"
+                  [class.active-like]="likedProducts.has(prod.product_id)"
+                  expand="block"
+                  shape="round"
+                  (click)="toggleLike(prod.product_id, $event)">
+  
+                  <ion-icon
+                    [name]="likedProducts.has(prod.product_id) ? 'heart' : 'heart-outline'"
+                    slot="start"
+                    class="heart-icon">
+                  </ion-icon>
+  
+                  {{ likedProducts.has(prod.product_id) ? '¡Me encanta!' : 'Me Gusta' }}
+  
+                </ion-button>
+              </div>
+            </ion-card>
+          </ion-col>
+        } @empty {
+          <ion-col size="12" class="empty-state animate-fade-up">
+            <ion-icon name="cube-outline" class="empty-icon"></ion-icon>
+            <h3>Sin resultados</h3>
+            <p>La inteligencia artificial está pensando... intenta con otra palabra.</p>
+          </ion-col>
+        }
+      }
+
+    </ion-row>
+  </ion-grid>
+
+  <ion-infinite-scroll (ionInfinite)="cargarMasProductos($event)">
+    <ion-infinite-scroll-content 
+      loadingSpinner="bubbles" 
+      loadingText="Cargando más productos...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <ion-modal 
+    [isOpen]="modalAbierto()" 
+    (didDismiss)="cerrarDetalle()"
+    [initialBreakpoint]="0.65" 
+    [breakpoints]="[0, 0.65, 0.95]"
+    [handle]="true"
+    [backdropDismiss]="true"
+    class="custom-bottom-sheet">
+    
+    <ng-template>
+      <ion-content class="modal-content ion-padding">
+        
+          @if (productoSeleccionado() && modalAbierto()) {
+            <div class="modal-img-wrapper">
+            <img [src]="productoSeleccionado().thumbnail" [alt]="productoSeleccionado().title" />
+            <div class="ai-match-badge">
+              <ion-icon name="sparkles"></ion-icon>
+              {{ obtenerPorcentajeMatch(productoSeleccionado().score) }}% Afinidad IA
+            </div>
+          </div>
+
+          <div class="modal-info">
+            <h2 class="modal-title">{{ productoSeleccionado().title }}</h2>
+            <p class="modal-price">{{ productoSeleccionado().price | currency:'USD' }}</p>
+            
+            <div class="divider"></div>
+            
+            <h3 class="section-title">Descripción</h3>
+            <p class="modal-description">{{ productoSeleccionado().description }}</p>
+          </div>
+
+          <div class="modal-footer">
+            <ion-button 
+              fill="outline" 
+              shape="round" 
+              class="modal-like-btn" 
+              [color]="likedProducts.has(productoSeleccionado().product_id) ? 'danger' : 'medium'"
+              (click)="toggleLike(productoSeleccionado().product_id)">
+              <ion-icon 
+                [name]="likedProducts.has(productoSeleccionado().product_id) ? 'heart' : 'heart-outline'" 
+                slot="icon-only">
+              </ion-icon>
+            </ion-button>
+
+            <ion-button expand="block" shape="round" class="buy-button" size="large" (click)="agregarAlCarrito(productoSeleccionado().product_id)">
+              <ion-icon name="cart-outline" slot="start"></ion-icon>
+              Añadir al carrito
+            </ion-button>
+          </div>
+        }
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
