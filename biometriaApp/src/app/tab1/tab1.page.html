@@ -29,12 +29,16 @@
       <div class="horizontal-scroll">
         @for (rec of recomendados(); track rec.product_id) {
           <ion-card class="recomendado-card" (click)="abrirDetalle(rec)">
-            <img [src]="rec.thumbnail" />
-
-            <ion-card-content>
+            <div class="recomendado-img-wrapper">
+              <img [src]="rec.thumbnail" [alt]="rec.title" loading="lazy" decoding="async" />
+            </div>
+            <ion-card-content class="recomendado-content">
               <h3>{{ rec.title }}</h3>
-              <p>{{ rec.price | currency:'USD' }}</p>
-              <small>{{ obtenerPorcentajeMatch(rec.score) }}% match IA</small>
+              <p class="price">{{ rec.price | currency:'USD' }}</p>
+              <div class="match-badge">
+                <ion-icon name="sparkles"></ion-icon>
+                <small>{{ obtenerPorcentajeMatch(rec.score) }}% match</small>
+              </div>
             </ion-card-content>
           </ion-card>
         }
@@ -72,11 +76,11 @@
   
             <ion-card 
               class="premium-card animate-fade-up"
-              [style.animation-delay]="(i * 0.1) + 's'"
+              [style.animation-delay]="((i % 10) * 0.05) + 's'"
               (click)="!modalTransition && abrirDetalle(prod)">
   
               <div class="image-wrapper">
-                <img [src]="prod.thumbnail" [alt]="prod.title" loading="lazy" />
+                <img [src]="prod.thumbnail" [alt]="prod.title" loading="lazy" decoding="async" />
                 <ion-badge color="primary" class="category-badge">
                   {{ prod.category }}
                 </ion-badge>

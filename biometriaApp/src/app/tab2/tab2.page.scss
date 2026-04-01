@@ -77,6 +77,12 @@ $text-medium: #8e8e93;
     font-size: 0.95rem;
     color: $text-dark;
     padding-right: 25px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .item-price {
