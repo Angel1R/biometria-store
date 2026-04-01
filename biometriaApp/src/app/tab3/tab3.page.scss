@@ -232,3 +232,86 @@
     font-size: 24px;
   }
 }
+
+/* --- ESTILOS DEL MODO PRIVADO --- */
+.private-mode-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0f1f38 0%, #14253f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+.private-content {
+  text-align: center;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+
+  .private-icon {
+    font-size: 80px;
+    color: #57c2ff;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 15px rgba(87, 194, 255, 0.4));
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  p {
+    margin: 0;
+    color: #8da0bc;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 280px;
+  }
+}
+
+.secure-pulse {
+  width: 60px;
+  height: 6px;
+  background: rgba(87, 194, 255, 0.2);
+  border-radius: 10px;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 30%;
+    background: #57c2ff;
+    border-radius: 10px;
+    animation: secureLoad 2s infinite ease-in-out;
+  }
+}
+
+@keyframes secureLoad {
+  0% { left: -30%; }
+  50% { left: 100%; }
+  100% { left: -30%; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(10px); }
+}
