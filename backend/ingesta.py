@@ -1,11 +1,12 @@
-import os
 import requests
 import pymongo
+import os
 from sentence_transformers import SentenceTransformer
 
 # --- CONFIGURACIÓN ---
-# Reemplaza con tu conexión real de MongoDB Atlas
-MONGO_URI = "os.getenv("MONGO_URI")" 
+MONGO_URI = os.getenv("MONGO_URI")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI no está configurada en el entorno")
 DB_NAME = "ecommerce_db"
 COLLECTION_NAME = "products"
 

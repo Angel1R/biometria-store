@@ -1,7 +1,7 @@
-import os
 import base64
 import hashlib
 import io
+import os
 import uvicorn
 import numpy as np
 import cv2
@@ -26,7 +26,9 @@ app.add_middleware(
 )
 
 # --- CONFIGURACIÓN BASE DE DATOS ---
-MONGO_URI = "os.getenv("MONGO_URI")"
+MONGO_URI = os.getenv("MONGO_URI")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI no está configurada en el entorno")
 client = MongoClient(MONGO_URI)
 db = client["ecommerce_db"]
 collection = db["products"]

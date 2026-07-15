@@ -3,7 +3,9 @@ from pymongo import MongoClient
 from sentence_transformers import SentenceTransformer
 
 # Conectamos a tu base de datos
-MONGO_URI = "os.getenv("MONGO_URI")"
+MONGO_URI = os.getenv("MONGO_URI")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI no está configurada en el entorno")
 client = MongoClient(MONGO_URI)
 collection = client["ecommerce_db"]["products"]
 
