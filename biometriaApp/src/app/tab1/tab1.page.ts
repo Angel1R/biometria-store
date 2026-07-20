@@ -27,7 +27,7 @@ export class Tab1Page implements OnInit, OnDestroy {
   private cartService = inject(CartService);
   private api = inject(ApiService);
 
-  // 🔥 RÚBRICA CUMPLIDA: Uso de Signals para gestión de estado reactivo moderno
+  // Use Signals for modern reactive state management
   productos = signal<any[]>([]);
   recomendados = signal<any[]>([]);
   isLoading = signal<boolean>(false);
@@ -40,7 +40,7 @@ export class Tab1Page implements OnInit, OnDestroy {
   ultimaCategoriaMostrada = '';
   private refreshRecommendationTimers: number[] = [];
 
-  // Categorías para dar el efecto "orgánico"
+  // Categories for organic effect
   categoriasRandom = ['tecnología', 'muebles', 'ropa', 'zapatos', 'relojes', 'hogar', 'deportes', 'accesorios'];
 
   constructor() {
@@ -105,7 +105,7 @@ export class Tab1Page implements OnInit, OnDestroy {
     this.api.getProducts(busqueda).subscribe({
       next: (res: any) => {
         if (esInfiniteScroll) {
-          // Si es scroll, concatenamos al signal actual
+          // If it's scroll, concatenate to current signal
           this.productos.update(prods => [...prods, ...res.resultados]);
           if (event) event.target.complete();
         } else {
@@ -123,9 +123,9 @@ export class Tab1Page implements OnInit, OnDestroy {
     });
   }
 
-  // 🔥 RÚBRICA CUMPLIDA: Infinite Scroll
+  // Infinite Scroll
   cargarMasProductos(event: any) {
-    // Al hacer scroll, busca otra categoría al azar para dar sensación de descubrimiento orgánico
+    // When scrolling, search for another random category to give a sense of organic discovery
     this.cargarProductos(this.obtenerCategoriaAzarDiferente(), true, event);
   }
 
@@ -142,8 +142,8 @@ export class Tab1Page implements OnInit, OnDestroy {
   }
 
   actualizarRecomendadosConReintento() {
-    // Disparamos de inmediato y luego dos reintentos cortos para captar
-    // cambios del backend que puedan tardar unos instantes tras un "like".
+    // Trigger immediately and then two short retries to capture
+    // backend changes that may take a moment after a "like".
     this.cargarRecomendados();
     this.limpiarTemporizadoresRecomendados();
 

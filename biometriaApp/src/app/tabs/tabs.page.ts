@@ -12,11 +12,11 @@ import { CartService } from '../services/cart.service';
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge],
 })
 export class TabsPage {
-  // Inyectamos el servicio para que el Badge del carrito se actualice solo
+  // Inject the service so the shopping cart badge updates automatically
   public cartService = inject(CartService);
 
   constructor() {
-    // 🔥 IMPORTANTE: Registrar los iconos para que no salgan vacíos
+    // IMPORTANT: Register icons so they don't appear empty
     addIcons({ storefrontOutline, cartOutline, shieldCheckmarkOutline });
   }
 }

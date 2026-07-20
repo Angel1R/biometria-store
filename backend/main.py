@@ -159,7 +159,7 @@ def register_interaction(interaction: Interaction):
     doc["_id"] = str(doc["_id"])
     return {"mensaje": "Interacción guardada con éxito", "data": doc}
 
-# 🔥 NUEVA RUTA: Envía la lista de likes desde la base de datos al frontend
+# Route to get user likes from database
 @app.get("/interact/{user_id}/likes")
 def get_user_likes(user_id: str):
     likes = list(interactions_collection.find({"user_id": user_id, "interaction_type": "like"}, {"product_id": 1, "_id": 0}))
@@ -177,7 +177,7 @@ def get_recommendations(query: str, limit: int = 5):
 
 @app.get("/recommendations/user/{user_id}")
 def get_user_recommendations(user_id: str, limit: int = 5):
-    # 🔥 EL ARREGLO ESTÁ AQUÍ: sort("timestamp", -1) fuerza a la IA a leer lo NUEVO, no la basura vieja.
+    # Sort by timestamp descending to read recent interactions first
     interacciones = list(interactions_collection.find({"user_id": user_id}).sort("timestamp", -1).limit(10))
     
     if not interacciones:
@@ -205,7 +205,7 @@ def get_user_recommendations(user_id: str, limit: int = 5):
     return {"usuario": user_id, "recomendaciones": list(collection.aggregate(pipeline))}
 
 
-# --- RUTAS DE RECONOCIMIENTO FACIAL ---
+# --- FACIAL RECOGNITION ROUTES ---
 @app.post("/auth/face/register")
 def register_face(data: FaceRegister):
     db_user = users_collection.find_one({"user_id": data.user_id})

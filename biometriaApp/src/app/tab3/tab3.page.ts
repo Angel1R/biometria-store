@@ -7,12 +7,12 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  eyeOffOutline, // Añadido para el modo privado
+  eyeOffOutline, // Added for private mode
   fingerPrintOutline, lockClosedOutline, logOutOutline, mailOutline,
   personCircleOutline, shieldCheckmarkOutline, sparkles, trashOutline,
 } from 'ionicons/icons';
 import { firstValueFrom } from 'rxjs';
-import { Camera } from '@capacitor/camera'; // 🔥 PLUGIN NATIVO DE CAPACITOR PARA LA RÚBRICA
+import { Camera } from '@capacitor/camera';
 import { Motion } from '@capacitor/motion';
 import { PluginListenerHandle } from '@capacitor/core';
 
@@ -39,7 +39,7 @@ export class Tab3Page implements OnInit {
   private readonly nativeBiometricService = inject(NativeBiometricService);
   private readonly faceRecognitionService = inject(FaceRecognitionService);
 
-  // 🔥 RÚBRICA: Gestión de estado reactivo moderno (SIGNALS)
+  // Modern reactive state management (SIGNALS)
   user = signal<SessionUser>({ userId: '', name: 'Usuario', email: '' });
 
   currentPassword = signal('');
@@ -58,13 +58,13 @@ export class Tab3Page implements OnInit {
   faceMessage = signal('');
   faceMessageColor = signal<'success' | 'danger' | 'medium'>('medium');
 
-  // --- VARIABLES PARA EL MODO PRIVADO ---
-  isPrivateMode = signal(false); // Convertido a Signal
+  // --- PRIVATE MODE VARIABLES ---
+  isPrivateMode = signal(false);
   private accelHandler?: PluginListenerHandle;
   private isCooldown = false;
   private privateModeTimeout?: any;
 
-  // 🔥 RÚBRICA: Valores reactivos computados
+  // Computed reactive values
   registerButtonLabel = computed(() => `Registrar ${this.biometricLabel()}`);
   canRegisterBiometrics = computed(() => this.biometricAvailable() && !this.biometricEnabled());
   
@@ -94,7 +94,7 @@ export class Tab3Page implements OnInit {
     addIcons({
       fingerPrintOutline, lockClosedOutline, logOutOutline, mailOutline,
       personCircleOutline, shieldCheckmarkOutline, sparkles, trashOutline,
-      eyeOffOutline // Añadimos el icono del ojo cerrado
+      eyeOffOutline
     });
   }
 
@@ -104,12 +104,12 @@ export class Tab3Page implements OnInit {
     await this.bindBiometryListener();
   }
 
-  // Se ejecuta CUANDO LA PÁGINA ES COMPLETAMENTE VISIBLE
+  // Executed when page is fully visible
   async ionViewDidEnter() {
     await this.iniciarDetectorMovimiento();
   }
 
-  // Se ejecuta JUSTO ANTES DE SALIR DE LA PÁGINA
+  // Executed just before leaving page
   async ionViewWillLeave() {
     await this.detenerDetectorMovimiento();
   }
@@ -119,7 +119,7 @@ export class Tab3Page implements OnInit {
     await this.loadFaceState();
   }
 
-  // --- LÓGICA DEL ACELERÓMETRO ---
+  // --- ACCELEROMETER LOGIC ---
   private async iniciarDetectorMovimiento() {
     try {
       if (typeof (DeviceMotionEvent as any)?.requestPermission === 'function') {
@@ -135,7 +135,7 @@ export class Tab3Page implements OnInit {
         }
       });
     } catch (error) {
-      console.warn('El acelerómetro no está disponible en este dispositivo', error);
+      console.warn('Accelerometer not available on this device', error);
     }
   }
 
@@ -153,16 +153,16 @@ export class Tab3Page implements OnInit {
 
   private activarModoPrivado() {
     this.isPrivateMode.set(true);
-    console.log('🛡️ Modo Privado Activado');
+    console.log('Private Mode Activated');
 
     this.privateModeTimeout = setTimeout(() => {
       this.isPrivateMode.set(false);
       this.isCooldown = true;
-      console.log('👁️ Modo Privado Terminado - Iniciando Cooldown');
+      console.log('Private Mode Ended - Starting Cooldown');
 
       setTimeout(() => {
         this.isCooldown = false;
-        console.log('✅ Cooldown Terminado - Listo para detectar de nuevo');
+        console.log('Cooldown Ended - Ready to detect again');
       }, 3000);
 
     }, 7000);
@@ -252,7 +252,7 @@ export class Tab3Page implements OnInit {
     this.faceMessage.set('');
 
     try {
-      // 🔥 RÚBRICA: GESTIÓN DE PERMISOS NATIVOS DE CAPACITOR EXCELENTE
+      // Check and request camera permissions
       const permissions = await Camera.checkPermissions();
       if (permissions.camera !== 'granted') {
         const request = await Camera.requestPermissions();

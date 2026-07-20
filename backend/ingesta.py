@@ -10,48 +10,48 @@ if not MONGO_URI:
 DB_NAME = "ecommerce_db"
 COLLECTION_NAME = "products"
 
-# Usamos un modelo ligero y rápido para generar los vectores (384 dimensiones)x
+# Use a lightweight and fast model to generate vectors (384 dimensions)
 MODEL_NAME = 'paraphrase-multilingual-MiniLM-L12-v2' 
 
 def run_ingestion():
-    print("🚀 Iniciando ingesta de datos...")
+    print("Starting data ingestion...")
 
-    # 1. Conexión a MongoDB
+    # 1. Connect to MongoDB
     try:
         client = pymongo.MongoClient(MONGO_URI)
         db = client[DB_NAME]
         collection = db[COLLECTION_NAME]
-        # Limpiamos la colección para evitar duplicados en pruebas
+        # Clean the collection to avoid duplicates in tests
         collection.delete_many({}) 
-        print("✅ Conectado a MongoDB (Colección limpiada).")
+        print("Connected to MongoDB (Collection cleaned).")
     except Exception as e:
-        print(f"❌ Error de conexión: {e}")
+        print(f"Connection error: {e}")
         return
 
-    # 2. Cargar modelo de IA (puede tardar un poco la primera vez que se descarga)
-    print("🧠 Cargando modelo de Inteligencia Artificial...")
+    # 2. Load AI model (may take a while the first time it's downloaded)
+    print("Loading Artificial Intelligence model...")
     model = SentenceTransformer(MODEL_NAME)
 
-    # 3. Obtener productos de la API
-    print("📥 Descargando productos de DummyJSON...")
+    # 3. Get products from API
+    print("Downloading products from DummyJSON...")
     response = requests.get('https://dummyjson.com/products?limit=100')
     products = response.json().get('products', [])
 
     documents_to_insert = []
 
-    print(f"🔄 Procesando {len(products)} productos y generando vectores...")
+    print(f"Processing {len(products)} products and generating vectors...")
     
     for product in products:
-        # Usamos .get() para evitar errores si el producto no tiene marca
+        # Use .get() to avoid errors if the product doesn't have a brand
         marca = product.get('brand', '')
         
-        # Juntamos los textos
+        # Join the texts
         text_to_embed = f"{product.get('title', '')} {product.get('category', '')} {marca} {product.get('description', '')}"
         
-        # Generamos el vector (embedding)
+        # Generate the vector (embedding)
         vector = model.encode(text_to_embed).tolist()
 
-        # Preparamos el documento para Mongo
+        # Prepare the document for Mongo
         doc = {
             "product_id": product.get('id'),
             "title": product.get('title'),
@@ -65,12 +65,12 @@ def run_ingestion():
         }
         documents_to_insert.append(doc)
 
-    # 4. Insertar en MongoDB
+    # 4. Insert into MongoDB
     if documents_to_insert:
         collection.insert_many(documents_to_insert)
-        print(f"🎉 ¡Éxito! Se insertaron {len(documents_to_insert)} productos con sus vectores en Atlas.")
+        print(f"Success! {len(documents_to_insert)} products with their vectors were inserted into Atlas.")
     else:
-        print("⚠️ No se encontraron productos.")
+        print("No products found.")
 
 if __name__ == "__main__":
     run_ingestion()

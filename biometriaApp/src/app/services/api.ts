@@ -7,21 +7,21 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ApiService {
-  // 🔥 Usamos la URL de Hugging Face definida en environment.ts
+  // API URL defined in environment.ts
   private readonly url = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
   /**
-   * Obtener productos generales (Búsqueda)
+   * Get general products (Search)
    */
   getProducts(query: string): Observable<any> {
     return this.http.get(`${this.url}/recommendations/?query=${query}&limit=20`);
   }
 
   /**
-   * Obtener recomendaciones personalizadas de la IA
-   * Se agrega un timestamp para obligar a Android a ignorar la caché.
+   * Get personalized AI recommendations
+   * A timestamp is added to force Android to ignore the cache.
    */
   getUserRecommendations(userId: string): Observable<any> {
     const antiCache = new Date().getTime();
@@ -29,7 +29,7 @@ export class ApiService {
   }
 
   /**
-   * Registro y Login tradicional
+   * Traditional registration and login
    */
   registerUser(data: any): Observable<any> {
     return this.http.post(`${this.url}/auth/register`, data);
@@ -40,7 +40,7 @@ export class ApiService {
   }
 
   /**
-   * Registrar interacciones (view, like, cart, purchase)
+   * Register interactions (view, like, cart, purchase)
    */
   registerInteraction(userId: string, productId: number, type: string): Observable<any> {
     const payload = {
@@ -52,39 +52,39 @@ export class ApiService {
   }
 
   /**
-   * 🔥 RECUPERAR LIKES: Para que los corazones rojos persistan al refrescar
+   * Get user likes: Retrieve likes from the database so that red hearts persist when refreshing
    */
   getUserLikes(userId: string): Observable<any> {
     return this.http.get(`${this.url}/interact/${userId}/likes`);
   }
 
   // ======================================================
-  // 🔥 MÉTODOS DE BIOMETRÍA FACIAL (Para Tab 3)
+  // Facial biometry methods (For Tab 3)
   // ======================================================
 
   /**
-   * Registrar el rostro de un usuario (Base64)
+   * Register user face (Base64)
    */
   registerUserFace(data: { user_id: string, image_base64: string }): Observable<any> {
     return this.http.post(`${this.url}/auth/face/register`, data);
   }
 
   /**
-   * Iniciar sesión comparando rostro (Base64)
+   * Login by comparing faces (Base64)
    */
   loginFace(data: { image_base64: string }): Observable<any> {
     return this.http.post(`${this.url}/auth/face/login`, data);
   }
 
   /**
-   * Verificar si el usuario ya tiene un rostro registrado
+   * Check if user already has a face registered
    */
   getStatus(userId: string): Observable<any> {
     return this.http.get(`${this.url}/auth/face/status/${userId}`);
   }
 
   /**
-   * Eliminar el registro facial del usuario
+   * Delete user face registration
    */
   deleteFace(userId: string): Observable<any> {
     return this.http.delete(`${this.url}/auth/face/${userId}`);
